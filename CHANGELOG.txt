@@ -1,0 +1,28 @@
+
+Version 0.1.4: Release date 2013-08-30
+--------------------------------------
+1. Added option for manual scaling of images. This is to allow the same scale factors to 
+   be applied to different models.
+2. Major re-write of cythonMods.pyx. No longer use lapack from numpy to solve system
+   of linear equations, but replaced with function SolveLinearEquations that performs
+   Guassian Elimination with partial pivoting. This resulted in a significant speed up
+   in creation of element maps.
+3. Addition of file version.py to include version information.
+
+
+Version 0.1.2: Release date 2013-08-13
+--------------------------------------
+1. Added support for C3D4 elements
+
+
+Version 0.1.1: Release date 2013-07-22
+--------------------------------------
+1. Bug fix. Fixed checkInputs function that was checking element types of implant even
+   when showImplant was set to False
+
+
+Version 0.1.0: Release date 2013-04-14
+--------------------------------------
+1. Functions fmin and fmax used in cythonMods.pyx. Cython module builds ok using gcc, but
+   failed when using MS Visual Studio 2008, because these functions are not defined in
+   MSVS 2008 file "math.h". Fix was to write own functions.

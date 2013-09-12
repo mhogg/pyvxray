@@ -1,0 +1,31 @@
+
+The pyvXRAY source distribution was built using the following procedure:
+1. Open command prompt and go to pyvXRAY directory
+2. Create cythonMods.c file: 
+   $ cd cython
+   $ cython cythonMods.pyx
+3. Build the source distribution
+   $ cd..
+   $ python setup.py sdist
+
+The pyvXRAY binary distribution was built using the following procedure:
+ - For Windows 64-bit 
+   $ python setup.py build_ext --compiler=msvc bdist 
+ - For Windows 64-bit (using ABAQUS python 2.6)
+   $ abaqus python setup.py bdist 
+
+NOTES: 
+1. Procedure for Windows 32-bit is similar, although will need to have the
+   32-bit version of ABAQUS, or a stand alone version of 32-bit Python that
+   uses the same module versions as ABAQUS (i.e. Python 2.6, numpy 1.4 etc) 
+2. When creating binary distribution using abaqus python, the --compiler 
+   option is not available. It will automatically use msvc if installed and
+   give an error otherwise.
+3. setup.cfg was used with the following settings:
+   [install] 
+   install_lib=abaqus_plugins
+4. To upload to PyPi, use the following command:
+   $ abaqus python setup.py sdist upload
+5. For some reason, PyPi doesn't like my binary distributions. Perhaps because
+   it does not use the standard install directory. Therefore, binaries are
+   manually uploaded to https://code.google.com/p/pyvxray/

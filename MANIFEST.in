@@ -1,0 +1,4 @@
+include *.in
+include *.txt
+recursive-include pyvXRAY *.pyd
+recursive-include cython *.c
