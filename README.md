@@ -13,8 +13,8 @@ MIT license - See license.txt for details
 * Python Image Library (PIL) >= 1.1.6
 
 NOTES:
-1. ABAQUS is a commerical software package and requires a license from [Simulia](http://www.3ds.com/products-services/simulia/overview/)
-2. Python and numpy are heavily used by pyvXRAY. These are built in to ABAQUS.
+1.  ABAQUS is a commerical software package and requires a license from [Simulia](http://www.3ds.com/products-services/simulia/overview/)
+2.  Python and numpy are heavily used by pyvXRAY. These are built in to ABAQUS.
 
 For building cython modules from source (e.g. if not using versions with pre-built modules):
 * A c compiler. The msvc compiler works best on Windows.
@@ -22,8 +22,8 @@ For building cython modules from source (e.g. if not using versions with pre-bui
 
 ##Documentation
 
-See website for information on pyvXRAY: http://pypi.python.org/pypi/pyvXRAY
+The documentation can be found on the project [website](https://code.google.com/p/pyvxray/)
 
 ## Help
  
-For help post a question on the `project support page <https://groups.google.com/forum/#!forum/pyvxray>`_
+For help post a question on the [project support page](https://groups.google.com/forum/#!forum/pyvxray)
