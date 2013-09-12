@@ -1,7 +1,6 @@
-
 # pyvXRAY
 
-**An ABAQUS plug-in for the creation of virtual x-rays from 3D finite element bone models**
+**An ABAQUS plug-in for the creation of virtual x-rays from 3D finite element bone/implant models**
 
 Copyright 2013, Michael Hogg (michael.christopher.hogg@gmail.com)
 
