@@ -5,7 +5,7 @@ An ABAQUS plug-in for the creation of virtual x-rays from 3D finite element bone
 
 Copyright 2013, Michael Hogg (michael.christopher.hogg@gmail.com)
 
-MIT license - See license.txt for details
+MIT license - See pyvxray/LICENSE.txt for details
 
 ## Requirements
 
@@ -13,6 +13,7 @@ MIT license - See license.txt for details
 * Python Image Library (PIL) >= 1.1.6
 
 NOTES:
+
 1.  ABAQUS is a commerical software package and requires a license from [Simulia](http://www.3ds.com/products-services/simulia/overview/)
 2.  Python and numpy are heavily used by pyvXRAY. These are built in to ABAQUS.
 
@@ -22,8 +23,8 @@ For building cython modules from source (e.g. if not using versions with pre-bui
 
 ##Documentation
 
-The documentation can be found on the project [website](https://code.google.com/p/pyvxray/)
+The documentation can be found on the project [website](https://code.google.com/p/pyvxray/).
 
 ## Help
  
-For help post a question on the [project support page](https://groups.google.com/forum/#!forum/pyvxray)
+For help post a question on the [project support page](https://groups.google.com/forum/#!forum/pyvxray).
