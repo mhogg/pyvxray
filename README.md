@@ -29,6 +29,10 @@ For building cython modules from source (e.g. if not using versions with pre-bui
 * The model must have a scalar fieldoutput variable representing bone density. This is typically a state variable such as SDV1
 * This scalar variable must be available in the last frame of each step to be analysed, as only the last frame is used.
 
+**LIMITATIONS:**
+
+* Virtual x-rays can only be created for element sets within part instances. Assembly element sets (which may contain elements from more than a single part) are currently not supported
+
 ##Documentation
 
 The documentation can be found on the project [website](https://code.google.com/p/pyvxray/).
