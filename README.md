@@ -55,7 +55,9 @@ Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python,
 
 * Edit the Windows registry and use a binary installer (Windows only)
 
-  By editing the Windows registry the binary installers will be able to detect the ABAQUS Python version and install as usual. To edit the Windows registry, follow these steps:
+  By editing the Windows registry the binary installers will be able to detect the ABAQUS Python version and install as usual. The user should use caution when editing the Windows registry.
+
+  To edit the Windows registry, follow these steps:
 
   + Create an empty file called `filename.reg`, where `filename` can be anything
   + Copy and paste the following text into this file:
@@ -73,9 +75,11 @@ Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python,
 
   + Replace the text `path_to_ABAQUS_Python` above with the actual path to the ABAQUS Python installation. This location depends on the ABAQUS version. For the default ABAQUS installation location, possible locations are:
 
-    * v6.11-1: `C:\\SIMULIA\\Abaqus\\6.11-1\\External\\Python`
-    * v6.12-1: `C:\\SIMULIA\\Abaqus\\6.12-1\\tools\\SMApy`
-    * v6.13-1: `C:\\SIMULIA\\Abaqus\\6.13-1\\tools\\SMApy\\python2.6`
+      v6.11-1: `C:\\SIMULIA\\Abaqus\\6.11-1\\External\\Python`
+     
+      v6.12-1: `C:\\SIMULIA\\Abaqus\\6.12-1\\tools\\SMApy`
+     
+      v6.13-1: `C:\\SIMULIA\\Abaqus\\6.13-1\\tools\\SMApy\\python2.6`
 
   + Save the file
   + In Windows Explorer, right click the file and select `Run with regedit`
@@ -84,8 +88,8 @@ Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python,
 * Install PIL from source (requires Microsoft C++ to be installed)
 
   + Download the PIL source, typically called `Imaging-x.x.x.tar.gz` where x.x.x is the version number
-  + Unpack this to a convenient location, giving directory `Imaging-x.x.x`
-  + Open a command prompt and browse to this folder (containing the setup.py file)
+  + Unpack this to a convenient location
+  + Open a command prompt and browse to folder `Imaging-x.x.x` (containing the setup.py file)
   + At the command prompt enter:
 
             abaqus python setup.py install
