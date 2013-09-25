@@ -43,7 +43,52 @@ The ABAQUS GUI is built on Python, and has its own Python installation. This Pyt
 
 ####2. Installation of pyvXRAY dependencies
 
-Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python, which is PIL. On Windows it is easist to download and run the binary installers. However, ABAQUS python typically does not appear in the list of Python installations, so binary installers often do not work.
+Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python, which is PIL. On Windows it is easist to download and run the binary installers. However, ABAQUS python typically does not appear in the list of Python installations, so binary installers often do not work. There are two solutions to this:
+
+* Separate Python installation and use a binary installer
+
+  The SIMULIA support site suggests that a separate Python installation be setup. The dependencies can then be installed easily into this Python installation, which can then be used by ABAQUS Python. This Python version must match the ABAQUS version, which has been 2.6.x for the following few ABAQUS versions. 
+
+  + Install [Python 2.6](http://python.org)
+  + Download the PIL binary installer and install
+  + Create an environment variable `PYTHONPATH=C:\Python26\Lib\site-packages`
+
+* Edit the Windows registry and use a binary installer (Windows only)
+
+  By editing the Windows registry the binary installers will be able to detect the ABAQUS Python version and install as usual. To edit the Windows registry, follow these steps:
+
+  + Create an empty file called `filename.reg`, where `filename` can be anything
+  + Copy and paste the following text into this file:
+
+    Windows Registry Editor Version 5.00
+
+    [HKEY_CURRENT_USER\Software\Python]
+ 
+    [HKEY_CURRENT_USER\Software\Python\Pythoncore]
+ 
+    [HKEY_CURRENT_USER\Software\Python\Pythoncore\2.6]
+ 
+    [HKEY_CURRENT_USER\Software\Python\Pythoncore\2.6\InstallPath]
+    @="path_to_ABAQUS_Python"
+
+  + Replace the text `path_to_ABAQUS_Python` above with the actual path to the ABAQUS Python installation. This location depends on the ABAQUS version. For the default ABAQUS installation location, possible locations are:
+
+    * v6.11-1: `C:\\SIMULIA\\Abaqus\\6.11-1\\External\\Python`
+    * v6.12-1: `C:\\SIMULIA\\Abaqus\\6.12-1\\tools\\SMApy`
+    * v6.13-1: `C:\\SIMULIA\\Abaqus\\6.13-1\\tools\\SMApy\\python2.6`
+
+  + Save the file
+  + In Windows Explorer, right click the file and select `Run with regedit`
+  + Download the PIL binary installer and install
+
+* Install PIL from source (requires Microsoft C++ to be installed)
+
+  + Download the PIL source, typically called `Imaging-x.x.x.tar.gz` where x.x.x is the version number
+  + Unpack this to a convenient location, giving directory `Imaging-x.x.x`
+  + Open a command prompt and browse to this folder (containing the setup.py file)
+  + At the command prompt enter:
+
+      `abaqus python setup.py install`
 
 ##Documentation
 
