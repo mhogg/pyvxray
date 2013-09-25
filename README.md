@@ -2,6 +2,8 @@
 
 **An ABAQUS plug-in for the creation of virtual x-rays from 3D finite element bone/implant models**
 
+**Developed together with [bonemapy](https://github.com/mhogg/bonemapy) and [BMDanalyse](https://github.com/mhogg/BMDanalyse) to provide tools for preparation and post-processing of bone/implant computer models.**
+
 Copyright 2013, Michael Hogg (michael.christopher.hogg@gmail.com)
 
 MIT license - See pyvxray/LICENSE.txt for details on usage and distribution
@@ -41,6 +43,16 @@ The ABAQUS GUI is built on Python, and has its own Python installation. This Pyt
 
 ####1. Installation of pyvXRAY plug-in
 
+* Pre-built pyvXRAY
+
+  + ...
+  + ... 
+
+* Installation from source 
+
+  + ...
+  + ...
+
 ####2. Installation of pyvXRAY dependencies
 
 Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python, which is PIL. On Windows it is easist to download and run the binary installers. However, ABAQUS python typically does not appear in the list of Python installations, so binary installers often do not work. There are two solutions to this:
@@ -49,9 +61,9 @@ Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python,
 
   The SIMULIA support site suggests that a separate Python installation be setup. The dependencies can then be installed easily into this Python installation, which can then be used by ABAQUS Python. This Python version must match the ABAQUS version, which has been 2.6.x for the following few ABAQUS versions. 
 
-  + Install [Python 2.6](http://python.org)
-  + Download the PIL binary installer and install
-  + Create an environment variable `PYTHONPATH=C:\Python26\Lib\site-packages`
+  + Download and install Python 2.6. The lastest binary installer can be downloaded from [python.org](http://www.python.org/download/releases/2.6.6/)
+  + Download the PIL binary installer and install. Binary installers for Windows 64-bit can be downloaded from [here](http://www.lfd.uci.edu/~gohlke/pythonlibs/).
+  + Create an environment variable `PYTHONPATH=C:\Python26\Lib\site-packages`, assuming that `C:\Python26` is the installation directory.
 
 * Edit the Windows registry and use a binary installer (Windows only)
 
@@ -83,7 +95,7 @@ Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python,
 
   + Save the file
   + In Windows Explorer, right click the file and select `Run with regedit`
-  + Download the PIL binary installer and install
+  + Download the PIL binary installer and install. Binary installers for Windows 64-bit can be downloaded from [here](http://www.lfd.uci.edu/~gohlke/pythonlibs/).
 
 * Install PIL from source (requires Microsoft C++ to be installed)
 
