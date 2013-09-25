@@ -60,16 +60,16 @@ Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python,
   + Create an empty file called `filename.reg`, where `filename` can be anything
   + Copy and paste the following text into this file:
 
-    Windows Registry Editor Version 5.00
+            Windows Registry Editor Version 5.00
 
-    [HKEY_CURRENT_USER\Software\Python]
+            [HKEY_CURRENT_USER\Software\Python]
  
-    [HKEY_CURRENT_USER\Software\Python\Pythoncore]
+            [HKEY_CURRENT_USER\Software\Python\Pythoncore]
  
-    [HKEY_CURRENT_USER\Software\Python\Pythoncore\2.6]
+            [HKEY_CURRENT_USER\Software\Python\Pythoncore\2.6]
  
-    [HKEY_CURRENT_USER\Software\Python\Pythoncore\2.6\InstallPath]
-    @="path_to_ABAQUS_Python"
+            [HKEY_CURRENT_USER\Software\Python\Pythoncore\2.6\InstallPath]
+            @="path_to_ABAQUS_Python"
 
   + Replace the text `path_to_ABAQUS_Python` above with the actual path to the ABAQUS Python installation. This location depends on the ABAQUS version. For the default ABAQUS installation location, possible locations are:
 
@@ -88,7 +88,7 @@ Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python,
   + Open a command prompt and browse to this folder (containing the setup.py file)
   + At the command prompt enter:
 
-      `abaqus python setup.py install`
+            abaqus python setup.py install
 
 ##Documentation
 
