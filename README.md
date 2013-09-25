@@ -33,6 +33,18 @@ For building cython modules from source (e.g. if not using versions with pre-bui
 
 * Virtual x-rays can only be created for element sets within part instances. Assembly element sets (which may contain elements from more than a single part) are currently not supported
 
+## Installation
+
+pyvXRAY is an ABAQUS plug-in. ABAQUS plug-ins may be installed in several ways. Only one of the ways is discussed here. For other options the user is referred to the ABAQUS user manuals.
+
+The ABAQUS GUI is built on Python, and has its own Python installation. This Python installation is not the typically Python setup, so some guidance is provided here on how to install pyvXRAY's dependencies.
+
+####1. Installation of pyvXRAY plug-in
+
+####2. Installation of pyvXRAY dependencies
+
+Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python, which is PIL. On Windows it is easist to download and run the binary installers. However, ABAQUS python typically does not appear in the list of Python installations, so binary installers often do not work.
+
 ##Documentation
 
 The documentation can be found on the project [website](https://code.google.com/p/pyvxray/).
