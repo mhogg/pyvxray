@@ -101,11 +101,27 @@ Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python,
       v6.13-1: `C:\\SIMULIA\\Abaqus\\6.13-1\\tools\\SMApy\\python2.6`
 
   Editing the Windows registry can be done using the regedit utility.
-  
-##Documentation
 
-The documentation can be found on the project [website](https://code.google.com/p/pyvxray/).
+## Usage
+
+* Open ABAQUS/CAE
+* Open the ABAQUS model within the current viewport
+* On the toolbar at the top of the screen, select:
+
+        Plug-ins --> pyvXRAY --> Create virtual x-rays
+  
+  This will launch the pyvXRAY GUI
+
+* Complete the required inputs in the GUI to suit the current model. Error messages will be issued if any information is entered incorrectly.
+* Click OK to run pyvXRAY
+* Look at the message area at the bottom of the screen for messages. On completion 'Finished' will be shown.
+
+## Outputs
+
+pyvXRAY outputs a series of virtual x-rays over a number of result steps. The virtual x-ray images are saved in common formats (png, jpeg, bmp) and can be opened in any imaging package.
+
+The recommended package for analysing these images is [BMDanalyse](https://github.com/mhogg/BMDanalyse), which is available free under the MIT license. BMDanalyse can be used to create regions of interest (ROIs) and output a graph of the change in average grey scale value in each ROI over all images.
 
 ## Help
  
-For help post a question on the [project support page](https://groups.google.com/forum/#!forum/pyvxray).
+For help post a question on the [project support page](https://groups.google.com/forum/#!forum/pyvxray) or create an Issue on Github.
