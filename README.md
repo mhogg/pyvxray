@@ -61,9 +61,9 @@ Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python,
 
   The SIMULIA support site suggests that a separate Python installation be setup. The dependencies can then be installed easily into this Python installation, which can then be used by ABAQUS Python. This Python version must match the ABAQUS version, which has been 2.6.x for the following few ABAQUS versions. This is often the easist solution if you have an older copy of EPD or similar Python distribution that contains several Python packages for scientific computing i.e. numpy, scipy etc.
 
-  + Download and install Python 2.6. The lastest binary installer can be downloaded from [python.org](http://www.python.org/download/releases/2.6.6/)
-  + Download the PIL binary installer and install. Binary installers for Windows 64-bit can be downloaded from [here](http://www.lfd.uci.edu/~gohlke/pythonlibs/).
-  + Create an environment variable `PYTHONPATH=C:\Python26\Lib\site-packages`, assuming that `C:\Python26` is the installation directory.
+  + Download and install Python 2.6 (standard python, or EPD distribution etc)
+  + If your Python distribution doesn't come with PIL, then download and run the PIL binary installer. (Note: Binary installers for Windows 64-bit can be downloaded from [here](http://www.lfd.uci.edu/~gohlke/pythonlibs/)).
+  + Create an environment variable `PYTHONPATH=C:\Python26\Lib\site-packages` that tells ABAQUS Python where these packages are installed, assuming that `C:\Python26` is the installation directory.
 
 * _Install PIL from source (on Windows this requires Microsoft C++ to be installed)_
 
