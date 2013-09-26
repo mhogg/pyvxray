@@ -112,7 +112,7 @@ thisDir  = os.path.dirname(thisPath)
 
 toolset = getAFXApp().getAFXMainWindow().getPluginToolset()
 toolset.registerGuiMenuButton(
-    buttonText='Bone modelling tools|Create virtual x-rays', 
+    buttonText='pyvXRAY|Create virtual x-rays', 
     object=PyvXRAY_plugin(toolset),
     messageId=AFXMode.ID_ACTIVATE,
     icon=None,
