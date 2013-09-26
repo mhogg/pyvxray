@@ -105,20 +105,20 @@ Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python,
 ## Usage
 
 * Open ABAQUS/CAE
-* Open the ABAQUS model within the current viewport
+* Open the ABAQUS odb file within the current viewport
 * On the menubar at the top of the screen, select:
 
         Plug-ins --> pyvXRAY --> Create virtual x-rays
   
   This will launch the pyvXRAY GUI
 
-* Complete the required inputs in the GUI to suit the current model. Error messages will be issued if any information is entered incorrectly.
+* Complete the required inputs in the GUI to suit the current model. More information is given below about the inputs. Error messages will be issued if any information is entered incorrectly.
 * Click OK to run pyvXRAY
 * Look at the message area at the bottom of the screen for messages. On completion 'Finished' will be shown.
 
 ## Outputs
 
-pyvXRAY outputs a series of virtual x-rays over a number of result steps. The virtual x-ray images are saved in common formats (png, jpeg, bmp) and can be opened in any imaging package.
+pyvXRAY outputs a series of virtual x-rays. The virtual x-ray images are saved in common image formats (png, jpeg, bmp) and can be opened in any imaging package.
 
 The recommended package for analysing these images is [BMDanalyse](https://github.com/mhogg/BMDanalyse), which is available free under the MIT license. BMDanalyse can be used to create regions of interest (ROIs) and output a graph of the change in average grey scale value in each ROI over all images.
 
