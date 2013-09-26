@@ -118,7 +118,7 @@ Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python,
 
 pyvXRAY outputs a series of virtual x-rays correponding to the analysis steps in the ABAQUS odb file. The virtual x-ray images are saved in common image formats (png, jpeg, bmp) and can be opened in any imaging package.
 
-The recommended package for analysing these images is [BMDanalyse](https://github.com/mhogg/BMDanalyse), which is available free under the MIT license. BMDanalyse can be used to create regions of interest (ROIs) and output a graph of the change in average grey scale value in each ROI in the image series. This can be related to the change in time of Bone Mineral Density (BMD) around an orthopaedic implant.
+The recommended package for analysing these images is [BMDanalyse](https://github.com/mhogg/BMDanalyse), which is available free under the MIT license. BMDanalyse can be used to create regions of interest (ROIs) and output a graph of the change in average grey scale value in each ROI in the image series. This can be related to the change in time of Bone Mineral Density (BMD).
 
 ## Help
  
