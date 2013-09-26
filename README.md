@@ -106,7 +106,7 @@ Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python,
 
 * Open ABAQUS/CAE
 * Open the ABAQUS model within the current viewport
-* On the toolbar at the top of the screen, select:
+* On the menubar at the top of the screen, select:
 
         Plug-ins --> pyvXRAY --> Create virtual x-rays
   
