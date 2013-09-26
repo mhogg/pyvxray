@@ -85,6 +85,8 @@ Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python,
       v6.12-1: `C:\\SIMULIA\\Abaqus\\6.12-1\\tools\\SMApy`
      
       v6.13-1: `C:\\SIMULIA\\Abaqus\\6.13-1\\tools\\SMApy\\python2.6`
+
+  Editing the Windows can be done using the regedit utility.
   
 ##Documentation
 
