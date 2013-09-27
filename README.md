@@ -142,7 +142,7 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 <th align="left">GUI tab</th><th>Input name </th><th>Input description</th>
 <tr>
 <td width="75">Select regions</td>
-<td width="150">Bone: Part instance name</td>
+<td width="200">Bone: Part instance name</td>
 <td>The name of the part instance containing the bone</td>
 </tr>
 <tr>
