@@ -141,8 +141,8 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 <table>
 <th align="left">GUI tab</th><th>Input name </th><th>Input description</th>
 <tr>
-<td width="100">Select regions</td>
-<td width="150">Bone: Part instance iame</td>
+<td width="75">Select regions</td>
+<td width="150">Bone: Part instance name</td>
 <td>The name of the part instance containing the bone</td>
 </tr>
 <tr>
@@ -189,16 +189,7 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 <td>Mapping resolution (mm)</td>
 <td>pyvXRAY works by mapping the results of the bone density variable onto a regular grid. The mapping resolution is the cell spacing of this regular grid. Decreasing this number increases the accuracy of the mapping, but also increases the calculation time. As a first pass, a value of around 2mm is recommended to ensure that all the inputs are correct.</td>
 </tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
+</table>
 
 ## Outputs
 
