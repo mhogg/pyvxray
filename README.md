@@ -118,26 +118,6 @@ Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python,
 
 A basic description of each of the inputs required by pyvXRAY is listed here.
 
-| GUI tab           | Input name                  | Input description     
-| ----------------- | --------------------------- | ----------------- 
-| Select regions    | Bone part instance          | The name of the part instance containing the bone                                                                                                                                        
-|                   | Bone Set name               | The element set in the part instance representing bone. If the entire part instance is bone, then an element set containing all the elements in the part instance is needed.             
-|                   | Bone Density variable       | A scalar fieldoutput variable representing bone density. This is most often a state variable i.e. SDV1                                                                                   
-|                   | Show implant on x-rays      | Option to include implant on the virtual x-rays                                                                                                                                                              
-|                   | Implant part instance name  | The name of the part instance containing the implant                                                                                                                                     
-|                   | Implant set name            | The element set in the part instance representing the implant. If the entire part instance is an implant, then an element set containing all the elements in the part instance is needed.
-|                   | Implant density (kg/m^3)    | The density of the implant material in kg/m^3 i.e. 4500 for Titanium Alloy                                                                                                               
-|                   |                             |                       
-| Inputs            | Step list                   | A list of steps to be analysed i.e. 1,2,3. A virtual x-ray is created for the last frame of each step in this list. If only a single step is required, must still contain a comma.
-|                   | Coordinate system           | The name of the coordinate system used to create the projections. By default this is the global coordinate system. However, the views can be changed by creating a new coordinate system in ABAQUS and using it instead.
-|                   | Mapping resolution (mm)     | pyvXRAY works by mapping the results of the bone density variable onto a regular grid. The mapping resolution is the cell spacing of this regular grid. Decreasing this number increases the accuracy of the mapping, but also increases the calculation time. As a first pass, a value of around 2mm is recommended to ensure that all the inputs are correct.
-|                   |                             |                                                                                                                                                                                                                                                                                   
-| X-ray settings    | Base name of xray file(s)   | This is the base or root name of the virtual x-ray image files. These are labelled `basename_stepnumber_projection` i.e. `basename_1_XY` for Step 1 projected onto the X-Y plane
-|                   | Approx size of x-ray images | Some scaling of images is performed to make the number of pixels along the largest image dimension equal to this value
-|                   | Image file format           | Output format of images. Options are png, jpeg, bmp 
-|                   | Smooth images               | Turn on image smoothing
-|                   | Manual scaling of images    | pyvXRAY scales the mapped bone density values when creating the virtual x-ray images. The image files are 24-bit (or 8-bit for each RGB channel), so the gray scale range is essentially 0-255. The scale factor used ensures that this range is fully utilised and that none of the images in the series are over-exposed. Activating this option reports the scale factors used and gives the user the ability to change these values. This may be desirable when comparing virtual x-rays from different models; an equal comparison is possible only if the same scale factors are used for both. 
-
 <table>
 <th align="left">GUI tab</th><th>Input name </th><th>Input description</th>
 <tr>
