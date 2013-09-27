@@ -139,21 +139,20 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 |                   | Manual scaling of images    | pyvXRAY scales the mapped bone density values when creating the virtual x-ray images. The image files are 24-bit (or 8-bit for each RGB channel), so the gray scale range is essentially 0-255. The scale factor used ensures that this range is fully utilised and that none of the images in the series are over-exposed. Activating this option reports the scale factors used and gives the user the ability to change these values. This may be desirable when comparing virtual x-rays from different models; an equal comparison is possible only if the same scale factors are used for both. 
 
 <table>
-<th align="left">GUI tab</th><th>Input name </th><th>Input description </th>
+<th align="left">GUI tab</th><th>Input name </th><th>Input description</th>
 <tr>
-<td width="150">Select regions</td>
+<td width="100">Select regions</td>
 <td width="150" align="center">Bone part instance</td>
-<td width ="600">The name of the part instance containing the bone</td>
+<td>The name of the part instance containing the bone</td>
 </tr>
 <tr>
-<td>   </td>
-<td>   </td>
-<td>   </td>
-</tr>
+<td></td>
+<td>Bone Set name</td>
+<td>The element set in the part instance representing bone. If the entire part instance is bone, then an element set containing all the elements in the part instance is needed.</td></tr>
 <tr>
-<td>   </td>
-<td>   </td>
-<td>   </td>
+<td></td>
+<td>Bone Density variable</td>
+<td>A scalar fieldoutput variable representing bone density. This is most often a state variable i.e. SDV1</td>
 </tr>
 </table>
 
