@@ -172,7 +172,7 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 <tr>
 <td>X-ray settings</td>
 <td>Base name of xray file(s)</td>
-<td>This is the base or root name of the virtual x-ray image files. These are labelled `basename_stepnumber_projection` i.e. `basename_1_XY` for Step 1 projected onto the X-Y plane</td>
+<td>This is the base or root name of the virtual x-ray image files. These are labelled <code>basename_stepnumber_projection</code> i.e. <code>basename_1_XY</code> for Step 1 projected onto the X-Y plane</td>
 </tr>
 <tr>
 <td></td>
