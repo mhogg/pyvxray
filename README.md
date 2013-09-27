@@ -182,7 +182,7 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 <tr>
 <td></td>
 <td>Image file format</td>
-<td>Output format of images. Options are png, jpeg, bmp </td>
+<td>Output format of images. Options are png, jpeg, and bmp </td>
 </tr>
 <tr>
 <td></td>
