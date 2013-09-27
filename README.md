@@ -142,19 +142,63 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 <th align="left">GUI tab</th><th>Input name </th><th>Input description</th>
 <tr>
 <td width="100">Select regions</td>
-<td width="150">Bone part instance</td>
+<td width="150">Bone: Part instance iame</td>
 <td>The name of the part instance containing the bone</td>
 </tr>
 <tr>
 <td></td>
-<td>Bone Set name</td>
+<td>Bone: Set name</td>
 <td>The element set in the part instance representing bone. If the entire part instance is bone, then an element set containing all the elements in the part instance is needed.</td></tr>
 <tr>
 <td></td>
-<td>Bone Density variable</td>
+<td>Bone: Density variable</td>
 <td>A scalar fieldoutput variable representing bone density.<br>This is most often a state variable i.e. SDV1</td>
 </tr>
-</table>
+<tr>
+<td></td>
+<td>Show implant on x-rays</td>
+<td>Option to include implant on the virtual x-rays </td>
+</tr>
+<tr>
+<td></td>
+<td>Implant: Part instance name</td>
+<td>The name of the part instance containing the implant</td>
+</tr>
+<tr>
+<td></td>
+<td>Implant: Set name</td>
+<td>The element set in the part instance representing the implant. If the entire part instance is an implant, then an element set containing all the elements in the part instance is needed.</td>
+</tr>
+<tr>
+<td></td>
+<td>Implant: Density (kg/m^3)</td>
+<td>The density of the implant material in kg/m^3 i.e. 4500 for Titanium Alloy</td>
+</tr>
+<tr>
+<td>Inputs</td>
+<td>Step list</td>
+<td>A list of steps to be analysed i.e. 1,2,3. A virtual x-ray is created for the last frame of each step in this list. If only a single step is required, must still contain a comma.</td>
+</tr>
+<tr>
+<td></td>
+<td>Coordinate system</td>
+<td>The name of the coordinate system used to create the projections. By default this is the global coordinate system. However, the views can be changed by creating a new coordinate system in ABAQUS and using it instead.</td>
+</tr>
+<tr>
+<td></td>
+<td>Mapping resolution (mm)</td>
+<td>pyvXRAY works by mapping the results of the bone density variable onto a regular grid. The mapping resolution is the cell spacing of this regular grid. Decreasing this number increases the accuracy of the mapping, but also increases the calculation time. As a first pass, a value of around 2mm is recommended to ensure that all the inputs are correct.</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
 
 ## Outputs
 
