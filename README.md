@@ -121,8 +121,8 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 <table>
 <th align="left">GUI tab</th><th>Input name </th><th>Input description</th>
 <tr>
-<td width="75">Select regions</td>
-<td width="200">Bone: Part instance name</td>
+<td width="100">Select regions</td>
+<td width="150">Bone: Part instance name</td>
 <td>The name of the part instance containing the bone</td>
 </tr>
 <tr>
@@ -168,6 +168,31 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 <td></td>
 <td>Mapping resolution (mm)</td>
 <td>pyvXRAY works by mapping the results of the bone density variable onto a regular grid. The mapping resolution is the cell spacing of this regular grid. Decreasing this number increases the accuracy of the mapping, but also increases the calculation time. As a first pass, a value of around 2mm is recommended to ensure that all the inputs are correct.</td>
+</tr>
+<tr>
+<td>X-ray settings</td>
+<td>Base name of xray file(s)</td>
+<td>This is the base or root name of the virtual x-ray image files. These are labelled `basename_stepnumber_projection` i.e. `basename_1_XY` for Step 1 projected onto the X-Y plane</td>
+</tr>
+<tr>
+<td></td>
+<td>Approx size of x-ray images</td>
+<td>Some scaling of images is performed to make the number of pixels along the largest image dimension equal to this value</td>
+</tr>
+<tr>
+<td></td>
+<td>Image file format</td>
+<td>Output format of images. Options are png, jpeg, bmp </td>
+</tr>
+<tr>
+<td></td>
+<td>Smooth images</td>
+<td>Turn on image smoothing</td>
+</tr>
+<tr>
+<td></td>
+<td>Manual scaling of images</td>
+<td>pyvXRAY scales the mapped bone density values when creating the virtual x-ray images. The image files are 24-bit (or 8-bit for each RGB channel), so the gray scale range is essentially 0-255. The scale factor used ensures that this range is fully utilised and that none of the images in the series are over-exposed. Activating this option reports the scale factors used and gives the user the ability to change these values. This may be desirable when comparing virtual x-rays from different models; an equal comparison is possible only if the same scale factors are used for both. </td>
 </tr>
 </table>
 
