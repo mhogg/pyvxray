@@ -4,11 +4,16 @@
 
 # This file is part of pyvXRAY - See LICENSE.txt for information on usage and redistribution
 
-import numpy, os
+import os
 from abaqus import session, getInputs
 from abaqusConstants import ELEMENT_NODAL
 from cythonMods import createElementMap, LinearTetInterpFunc, QuadTetInterpFunc
-from PIL import Image, ImageFilter
+
+# Use try to prevent error importing missing modules when pyvXRAY plug-in is launched
+try:
+    import numpy
+    from PIL import Image, ImageFilter
+except: pass
 
 # ~~~~~~~~~~
 
