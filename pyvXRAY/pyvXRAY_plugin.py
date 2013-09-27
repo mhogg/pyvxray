@@ -111,6 +111,24 @@ class PyvXRAY_plugin(AFXForm):
                 showAFXErrorDialog(self.getCurrentDialog(), 'Density variable %s is not available in Step number %i' % (BMDfoname,stepNumber))
                 return False
                 
+        # Check for Abaqus version >= 6.11 
+        majorNumber, minorNumber, updateNumber = getAFXApp().getVersionNumbers()
+        if majorNumber==6 and minorNumber < 11:    
+            showAFXErrorDialog( self.getCurrentDialog(), 'Error: ABAQUS 6.11 and above is required')
+            return False
+        
+        # Check for numpy
+        try: import numpy
+        except: 
+            showAFXErrorDialog( self.getCurrentDialog(), 'Error: Required module numpy cannot be found')
+            return False   
+
+        # Check for PIL or Pillow
+        try: from PIL import Image
+        except: 
+            showAFXErrorDialog( self.getCurrentDialog(), 'Error: Required module PIL / Pillow cannot be found')
+            return False                
+                
         return True
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
