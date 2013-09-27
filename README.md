@@ -152,7 +152,7 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 <tr>
 <td></td>
 <td>Bone Density variable</td>
-<td>A scalar fieldoutput variable representing bone density. This is most often a state variable i.e. SDV1</td>
+<td>A scalar fieldoutput variable representing bone density.<br>This is most often a state variable i.e. SDV1</td>
 </tr>
 </table>
 
