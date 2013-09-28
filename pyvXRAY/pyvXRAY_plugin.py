@@ -8,6 +8,8 @@ from abaqusGui import *
 from abaqusConstants import ALL
 import os
 from version import version as __version__
+# Required to ensure the CSYS list is up to date
+from kernelAccess import session  
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -17,8 +19,10 @@ class PyvXRAY_plugin(AFXForm):
         
         # Construct the base class 
         AFXForm.__init__(self, owner)
-        
-        self.imageFormats=['bmp','jpeg','png']
+
+        self.odb          = None    
+        self.csysList     = None         
+        self.imageFormats = ['bmp','jpeg','png']
         
         # Keyword definitions
         self.radioButtonGroups   = {}
@@ -30,8 +34,8 @@ class PyvXRAY_plugin(AFXForm):
         self.iPartNameKw         = AFXStringKeyword(self.cmd, 'iPartName', True, 'PART-1-1')
         self.iSetNameKw          = AFXStringKeyword(self.cmd, 'iSetName', True, 'IMPLANT')
         self.iDensityKw          = AFXFloatKeyword(self.cmd,  'iDensity', True, 4500)
-        self.stepListKw          = AFXStringKeyword(self.cmd, 'stepList', True, '1')
-        self.csysNameKw          = AFXStringKeyword(self.cmd, 'csysName', True, 'CSYS-1')
+        self.stepListKw          = AFXStringKeyword(self.cmd, 'stepList', True, '1, 2, 3')
+        self.csysNameKw          = AFXStringKeyword(self.cmd, 'csysName', True, '')
         self.resGridKw           = AFXFloatKeyword(self.cmd,  'resGrid', True, 2)
         self.imageNameBaseKw     = AFXStringKeyword(self.cmd, 'imageNameBase', True, 'vxray')
         self.preferredXraySizeKw = AFXIntKeyword(self.cmd,    'preferredXraySize', True, 800)
@@ -39,6 +43,22 @@ class PyvXRAY_plugin(AFXForm):
         self.smoothKw            = AFXBoolKeyword(self.cmd,   'smooth', AFXBoolKeyword.TRUE_FALSE, True, True)
         self.manualScalingKw     = AFXBoolKeyword(self.cmd,   'manualImageScaling', AFXBoolKeyword.TRUE_FALSE, True, False)
         self.showImplant         = None
+        
+    def getOdb(self):
+        displayedType = getDisplayedObjectType()        
+        if displayedType==ODB:
+            self.odb = session.viewports[session.currentViewportName].displayedObject 
+        
+    def getCsyses(self): 
+        # Check scratch odb csyses
+        self.csysList = {'Session':[], 'ODB':[]}
+        for k,v in session.scratchOdbs.items():
+            for csysName in v.rootAssembly.datumCsyses.keys():
+                self.csysList['Session'].append(csysName)
+        # Check odb csyses if an odb is open in the current viewport                
+        if self.odb != None:
+            for csysName in self.odb.rootAssembly.datumCsyses.keys(): 
+                self.csysList['ODB'].append(csysName)        
 
     def getFirstDialog(self):
 
@@ -47,20 +67,18 @@ class PyvXRAY_plugin(AFXForm):
 
     def doCustomChecks(self):
     
-        # Check that object in current viewport is an odb file
-        displayedType = getDisplayedObjectType()
-        if displayedType!=ODB:
+        # Check that object in current viewport is an odb file       
+        if self.odb==None:
             showAFXErrorDialog(self.getCurrentDialog(), 'Error: Object in current viewport is not an odb object')
             return False    
-        odb = session.viewports[session.currentViewportName].displayedObject  
 
         # Check that the selected bone region and element set exists
         bPartName = self.bPartNameKw.getValue()
         bSetName  = self.bSetNameKw.getValue()
-        if bPartName not in odb.rootAssembly.instances.keys():
+        if bPartName not in self.odb.rootAssembly.instances.keys():
             showAFXErrorDialog(self.getCurrentDialog(), 'Error: %s is not a part instance in the current odb' % bPartName)
             return False
-        if bSetName not in odb.rootAssembly.instances[bPartName].elementSets.keys():
+        if bSetName not in self.odb.rootAssembly.instances[bPartName].elementSets.keys():
             showAFXErrorDialog(self.getCurrentDialog(), 'Error: %s is not an element set in part instance %s' % (bSetName,bPartName))
             return False
             
@@ -69,10 +87,10 @@ class PyvXRAY_plugin(AFXForm):
             iPartName = self.iPartNameKw.getValue()
             iSetName  = self.iSetNameKw.getValue()
             iDensity  = self.iDensityKw.getValue()
-            if iPartName not in odb.rootAssembly.instances.keys():
+            if iPartName not in self.odb.rootAssembly.instances.keys():
                 showAFXErrorDialog(self.getCurrentDialog(), 'Error: %s is not a part instance in the current odb' % iPartName)
                 return False 
-            if iSetName not in odb.rootAssembly.instances[iPartName].elementSets.keys():
+            if iSetName not in self.odb.rootAssembly.instances[iPartName].elementSets.keys():
                 showAFXErrorDialog(self.getCurrentDialog(), 'Error: %s is not an element set in part instance %s' % (iSetName,iPartName))
                 return False
             try: float(iDensity)
@@ -94,11 +112,7 @@ class PyvXRAY_plugin(AFXForm):
         diff = [True for i in range(len(stepList)-1) if stepList[i+1]-stepList[i]<0]
         if len(diff)>0: 
             showAFXErrorDialog(self.getCurrentDialog(), 'Error: Step numbers in step list not in increasing order' )
-            return False 
-
-        # Check that coordinate system exists
-        # Do this is in the kernel - If it doesn't exist, we just use the global coordinate system. A message will be written from the kernel to the Message Area.   
-        # NOTE: This should really be replaced with a list of available CSYSs, so the user knows what can be selected.        
+            return False  
     
         # Check mapping resolution, resGrid
         resGrid = self.resGridKw.getValue()

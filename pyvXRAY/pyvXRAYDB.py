@@ -52,7 +52,21 @@ class PyvXRAYDB(AFXDataDialog):
         GroupBox_3 = FXGroupBox(p=TabItem_2, text='Required inputs', opts=FRAME_GROOVE|LAYOUT_FILL_X|LAYOUT_FILL_Y)
         VAligner_3 = AFXVerticalAligner(p=GroupBox_3, opts=0, x=0, y=0, w=0, h=0, pl=0, pr=0, pt=10, pb=10)
         AFXTextField(p=VAligner_3, ncols=21, labelText='Step list:', tgt=form.stepListKw, sel=0, pt=5, pb=5)
-        AFXTextField(p=VAligner_3, ncols=21, labelText='Coordinate system:', tgt=form.csysNameKw, sel=0, pt=5, pb=5)
+        
+        #AFXTextField(p=VAligner_3, ncols=21, labelText='Coordinate system:', tgt=form.csysNameKw, sel=0, pt=5, pb=5)
+        self.ComboBox_1 = AFXComboBox(p=VAligner_3, ncols=19, nvis=1, text='Coordinate system:', tgt=form.csysNameKw, sel=0, pt=5, pb=5)
+        self.form.getOdb()
+        self.form.getCsyses() 
+        self.ComboBox_1.setMaxVisible(5)        
+        csyses = []
+        for csysType,csysNames in form.csysList.items():
+            for csysName in csysNames:
+                listText = '%s (%s)' % (csysName,csysType)
+                csyses.append(listText)
+        self.form.csysNameKw.setValue(csyses[0])
+        for csys in csyses:        
+            self.ComboBox_1.appendItem(text=csys)        
+        
         AFXTextField(p=VAligner_3, ncols=21, labelText='Mapping resolution (mm):      ', tgt=form.resGridKw, sel=0, pt=5, pb=5)
 
         # X-ray settings Tab
