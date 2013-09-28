@@ -50,7 +50,7 @@ class PyvXRAY_plugin(AFXForm):
         # Check that object in current viewport is an odb file
         displayedType = getDisplayedObjectType()
         if displayedType!=ODB:
-            showAFXErrorDialog(self.getCurrentDialog(), 'Object in current viewport is not an odb object')
+            showAFXErrorDialog(self.getCurrentDialog(), 'Error: Object in current viewport is not an odb object')
             return False    
         odb = session.viewports[session.currentViewportName].displayedObject  
 
@@ -58,10 +58,10 @@ class PyvXRAY_plugin(AFXForm):
         bPartName = self.bPartNameKw.getValue()
         bSetName  = self.bSetNameKw.getValue()
         if bPartName not in odb.rootAssembly.instances.keys():
-            showAFXErrorDialog(self.getCurrentDialog(), '%s is not a part instance in the current odb' % bPartName)
+            showAFXErrorDialog(self.getCurrentDialog(), 'Error: %s is not a part instance in the current odb' % bPartName)
             return False
         if bSetName not in odb.rootAssembly.instances[bPartName].elementSets.keys():
-            showAFXErrorDialog(self.getCurrentDialog(), '%s is not an element set in part instance %s' % (bSetName,bPartName))
+            showAFXErrorDialog(self.getCurrentDialog(), 'Error: %s is not an element set in part instance %s' % (bSetName,bPartName))
             return False
             
         # If user has requested the implant to be displayed, then check the selected implant region and element set exists
@@ -70,45 +70,62 @@ class PyvXRAY_plugin(AFXForm):
             iSetName  = self.iSetNameKw.getValue()
             iDensity  = self.iDensityKw.getValue()
             if iPartName not in odb.rootAssembly.instances.keys():
-                showAFXErrorDialog(self.getCurrentDialog(), '%s is not a part instance in the current odb' % iPartName)
+                showAFXErrorDialog(self.getCurrentDialog(), 'Error: %s is not a part instance in the current odb' % iPartName)
                 return False 
             if iSetName not in odb.rootAssembly.instances[iPartName].elementSets.keys():
-                showAFXErrorDialog(self.getCurrentDialog(), '%s is not an element set in part instance %s' % (iSetName,iPartName))
+                showAFXErrorDialog(self.getCurrentDialog(), 'Error: %s is not an element set in part instance %s' % (iSetName,iPartName))
                 return False
+            try: float(iDensity)
+            except: 
+                showAFXErrorDialog(self.getCurrentDialog(), 'Error: Implant density value is not a number')
+                return False               
             if iDensity<0:
-                showAFXErrorDialog(self.getCurrentDialog(), 'Implant density must be greater than 0')
+                showAFXErrorDialog(self.getCurrentDialog(), 'Error: Implant density must be greater than 0')
                 return False    
 
-        # Check preferred size of images
-        preferredXraySize = self.preferredXraySizeKw.getValue()
-        minXraySize = 100
-        if preferredXraySize < minXraySize:
-            showAFXErrorDialog(self.getCurrentDialog(), 'Minimum virtual x-ray image size is %i pixels' % minXraySize)
-            return False    
-
         # Check that values in stepList are valid. Also check that the values are in increasing order
-        try: stepList = stepList.split(',')
+        stepList = self.stepListKw.getValue()
+        try: 
+            stepList = stepList.split(',')
+            stepList = [int(s) for s in stepList]
         except: 
-            showAFXErrorDialog(self.getCurrentDialog(), 'Error in step list')
+            showAFXErrorDialog(self.getCurrentDialog(), 'Error: Cannot convert step list values to integers')
             return False
         diff = [True for i in range(len(stepList)-1) if stepList[i+1]-stepList[i]<0]
         if len(diff)>0: 
-            showAFXErrorDialog(self.getCurrentDialog(), 'Step numbers in step list not in increasing order' )
-            return False          
+            showAFXErrorDialog(self.getCurrentDialog(), 'Error: Step numbers in step list not in increasing order' )
+            return False  
             
+        # Check mapping resolution, resGrid
+        resGrid = self.resGridKw.getValue()
+        try: resGrid = float(resGrid)
+        except: 
+            showAFXErrorDialog(self.getCurrentDialog(), 'Error: "Inputs: Mapping resolution" value not valid')
+            return False 
+
+        # Check preferred size of images
+        preferredXraySize = self.preferredXraySizeKw.getValue()
+        try: preferredXraySize = int(preferredXraySize)
+        except: 
+            showAFXErrorDialog(self.getCurrentDialog(), 'Error: "X-ray Settings: Approx size of x-ray" value not valid')
+            return False
+        minXraySize = 100
+        if preferredXraySize < minXraySize:
+            showAFXErrorDialog(self.getCurrentDialog(), 'Error: Minimum virtual x-ray image size is %i pixels' % minXraySize)
+            return False   
+
         # Check that all steps in step list exist and that density variable exists in all steps (last frame)
         # NOTE: Do this last because it is the most time consuming
-        stepList  = eval(self.stepListKw.getValue())
         BMDfoname = self.BMDfonameKw.getValue()
         stepInfo  = {}
         for stepName,step in odb.steps.items():
             stepInfo[step.number] = step.frames[-1].fieldOutputs.keys()
         for stepNumber in stepList:
             if stepNumber not in stepInfo:
-                showAFXErrorDialog(self.getCurrentDialog(), 'Step number %i is not available in odb' % stepNumber)
+                showAFXErrorDialog(self.getCurrentDialog(), 'Error: Step number %i is not available in odb' % stepNumber)
                 return False
             if BMDfoname not in stepInfo[stepNumber]:
-                showAFXErrorDialog(self.getCurrentDialog(), 'Density variable %s is not available in Step number %i' % (BMDfoname,stepNumber))
+                showAFXErrorDialog(self.getCurrentDialog(), 'Error: Density variable %s is not available in Step number %i' % (BMDfoname,stepNumber))
                 return False
                 
         # Check for Abaqus version >= 6.11 
@@ -135,12 +152,12 @@ class PyvXRAY_plugin(AFXForm):
 
 # Register the plug-in
 
-desc  = 'An ABAQUS plugin used to generate a time series of virtual x-rays from the output of a bone remodelling analysis.\n\n'                  + \
-        'The resulting images can be used to analyse the change in bone density over time in a number of regions of interest or "Gruen Zones", ' + \
-        'typically due to changes in loading following insertion of an orthopaedic implant. Associated tool BMDanalyse, available on PyPi, was ' + \ 
-        'created for this sole purpose.\n\nRequires an odb file to be open within the current viewport which has a fieldoutput representing '    + \
-        'bone density. Works by mapping the bone density fieldoutput onto a regular 3D grid and then projecting the values onto the three '      + \
-        'orthogonal planes. Currently only models with C3D4 or C3D10 elements are supported.'
+desc = 'An ABAQUS plugin used to generate a time series of virtual x-rays from the output of a bone remodelling analysis.\n\n'                  + \
+       'The resulting images can be used to analyse the change in bone density over time in a number of regions of interest or "Gruen Zones", ' + \
+       'typically due to changes in loading following insertion of an orthopaedic implant. Associated tool BMDanalyse, available on PyPi, was ' + \
+       'created for this sole purpose.\n\nRequires an odb file to be open within the current viewport which has a fieldoutput representing '    + \
+       'bone density. Works by mapping the bone density fieldoutput onto a regular 3D grid and then projecting the values onto the three '      + \
+       'orthogonal planes. Currently only models with C3D4 or C3D10 elements are supported.'
 
 toolset = getAFXApp().getAFXMainWindow().getPluginToolset()
 toolset.registerGuiMenuButton(
