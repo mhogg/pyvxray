@@ -94,8 +94,12 @@ class PyvXRAY_plugin(AFXForm):
         diff = [True for i in range(len(stepList)-1) if stepList[i+1]-stepList[i]<0]
         if len(diff)>0: 
             showAFXErrorDialog(self.getCurrentDialog(), 'Error: Step numbers in step list not in increasing order' )
-            return False  
-            
+            return False 
+
+        # Check that coordinate system exists
+        # Do this is in the kernel - If it doesn't exist, we just use the global coordinate system. A message will be written from the kernel to the Message Area.   
+        # NOTE: This should really be replaced with a list of available CSYSs, so the user knows what can be selected.        
+    
         # Check mapping resolution, resGrid
         resGrid = self.resGridKw.getValue()
         try: resGrid = float(resGrid)
@@ -131,19 +135,19 @@ class PyvXRAY_plugin(AFXForm):
         # Check for Abaqus version >= 6.11 
         majorNumber, minorNumber, updateNumber = getAFXApp().getVersionNumbers()
         if majorNumber==6 and minorNumber < 11:    
-            showAFXErrorDialog( self.getCurrentDialog(), 'Error: ABAQUS 6.11 and above is required')
+            showAFXErrorDialog( self.getCurrentDialog(), 'Error: ABAQUS 6.11 and above is required' )
             return False
         
         # Check for numpy
         try: import numpy
         except: 
-            showAFXErrorDialog( self.getCurrentDialog(), 'Error: Required module numpy cannot be found')
+            showAFXErrorDialog( self.getCurrentDialog(), 'Error: Required module numpy cannot be found' )
             return False   
 
         # Check for PIL or Pillow
         try: from PIL import Image
         except: 
-            showAFXErrorDialog( self.getCurrentDialog(), 'Error: Required module PIL / Pillow cannot be found')
+            showAFXErrorDialog( self.getCurrentDialog(), 'Error: Required module PIL / Pillow cannot be found' )
             return False                
                 
         return True
