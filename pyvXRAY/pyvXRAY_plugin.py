@@ -5,7 +5,7 @@
 # This file is part of pyvXRAY - See LICENSE.txt for information on usage and redistribution
 
 from abaqusGui import *
-from abaqusConstants import ALL
+from abaqusConstants import ALL, CARTESIAN
 import os
 from version import version as __version__
 # Required to ensure the CSYS list is up to date
@@ -45,27 +45,39 @@ class PyvXRAY_plugin(AFXForm):
         self.showImplant         = None
         
     def getOdb(self):
+        """Get the odb in the current viewport"""
         displayedType = getDisplayedObjectType()        
         if displayedType==ODB:
-            self.odb = session.viewports[session.currentViewportName].displayedObject 
+            self.odb = session.viewports[session.currentViewportName].displayedObject
+        else:
+            self.odb = None 
         
     def getCsyses(self): 
+        """Get list of all available csyses"""
         # Check scratch odb csyses
         self.csysList = {'Session':[], 'ODB':[]}
         for k,v in session.scratchOdbs.items():
-            for csysName in v.rootAssembly.datumCsyses.keys():
-                self.csysList['Session'].append(csysName)
+            for csysName,csys in v.rootAssembly.datumCsyses.items():
+                if csys.type==CARTESIAN:
+                    self.csysList['Session'].append(csysName)
         # Check odb csyses if an odb is open in the current viewport                
         if self.odb != None:
-            for csysName in self.odb.rootAssembly.datumCsyses.keys(): 
-                self.csysList['ODB'].append(csysName)        
+            for csysName,csys in self.odb.rootAssembly.datumCsyses.items():
+                if csys.type==CARTESIAN: 
+                    self.csysList['ODB'].append(csysName)        
 
     def getFirstDialog(self):
+        """Create the dialog box"""
+        
+        # Get odb information to populate the dialog box
+        self.getOdb() 
+        self.getCsyses()    
 
         import pyvXRAYDB
         return pyvXRAYDB.PyvXRAYDB(self)
 
     def doCustomChecks(self):
+        """Perform custom checks of inputs"""
     
         # Check that object in current viewport is an odb file       
         if self.odb==None:
@@ -104,8 +116,7 @@ class PyvXRAY_plugin(AFXForm):
         # Check that values in stepList are valid. Also check that the values are in increasing order
         stepList = self.stepListKw.getValue()
         try: 
-            stepList = stepList.split(',')
-            stepList = [int(s) for s in stepList]
+            stepList = [int(s) for s in stepList.replace(',',' ').split()]
         except: 
             showAFXErrorDialog(self.getCurrentDialog(), 'Error: Cannot convert step list values to integers')
             return False
@@ -136,7 +147,7 @@ class PyvXRAY_plugin(AFXForm):
         # NOTE: Do this last because it is the most time consuming
         BMDfoname = self.BMDfonameKw.getValue()
         stepInfo  = {}
-        for stepName,step in odb.steps.items():
+        for stepName,step in self.odb.steps.items():
             stepInfo[step.number] = step.frames[-1].fieldOutputs.keys()
         for stepNumber in stepList:
             if stepNumber not in stepInfo:
