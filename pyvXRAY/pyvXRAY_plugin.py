@@ -42,7 +42,6 @@ class PyvXRAY_plugin(AFXForm):
         self.imageFormatKw       = AFXStringKeyword(self.cmd, 'imageFormat', True, self.imageFormats[-1])
         self.smoothKw            = AFXBoolKeyword(self.cmd,   'smooth', AFXBoolKeyword.TRUE_FALSE, True, True)
         self.manualScalingKw     = AFXBoolKeyword(self.cmd,   'manualImageScaling', AFXBoolKeyword.TRUE_FALSE, True, False)
-        self.showImplant         = None
         
     def getOdb(self):
         """Get the odb in the current viewport"""
@@ -95,7 +94,7 @@ class PyvXRAY_plugin(AFXForm):
             return False
             
         # If user has requested the implant to be displayed, then check the selected implant region and element set exists
-        if self.showImplant:
+        if self.showImplantKw.getValue():
             iPartName = self.iPartNameKw.getValue()
             iSetName  = self.iSetNameKw.getValue()
             iDensity  = self.iDensityKw.getValue()

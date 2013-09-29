@@ -86,7 +86,6 @@ class PyvXRAYDB(AFXDataDialog):
         
     def processUpdates(self):
         # Update form
-        self.form.showImplant = self.cb1.getCheck()
         # Disable implant option if show implant not checked
         tfs = [self.tf1,self.tf2,self.tf3]
         if self.cb1.getCheck():
