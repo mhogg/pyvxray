@@ -23,7 +23,7 @@ For building cython modules from source (e.g. if not using releases with pre-bui
 
 1.  ABAQUS is a commerical software package and requires a license from [Simulia](http://www.3ds.com/products-services/simulia/overview/)
 2.  The authors of pyvXRAY are not associated with ABAQUS/Simulia 
-3.  Python and numpy are heavily used by pyvXRAY. These are built in to ABAQUS. All of the last few releases (v6.11-v6.13) use Python 2.6 and numpy 1.4
+3.  Python and numpy are heavily used by pyvXRAY. These are built in to ABAQUS. All of the last few releases (v6.11 - v6.13) use Python 2.6.x and numpy 1.4.x
 
 ### Model setup requirements
 
@@ -57,14 +57,14 @@ The ABAQUS GUI is built on Python, and has its own Python installation. This Pyt
 
 * _Installation from source_
 
-  + Download the latest pyvXRAY source, typically called `pyvXRAY-x.x.x.zip` or `pyvXRAY-x.x.x.tar.gz`, where x.x.x is the version number
+  + Download the latest pyvXRAY source, typically called `pyvXRAY-x.x.x.zip` or `pyvXRAY-x.x.x.tar.gz`, where `x.x.x` is the version number
   + Unpack this to a convenient location
-  + Open a command prompt and browse to directory pyvXRAY-x.x.x (containing file setup.py)
+  + Open a command prompt and browse to directory `pyvXRAY-x.x.x` (containing file `setup.py`)
   + Run the following command:
 
             abaqus python setup.py build_ext --inplace
 
-      which will build the cython modules
+      which will build the Cython modules. If Cython is available, it will be used; otherwise the .c files previously generated using Cython will be compiled directly.
   + Copy the pyvXRAY sub-folder to the `abaqus_plugins` directory within your ABAQUS installation, following the instructions above for pre-built distribution 
 
 ####2. Installation of pyvXRAY dependencies
@@ -81,9 +81,9 @@ Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python,
 
 * _Install PIL from source (on Windows this requires Microsoft C++ to be installed)_
 
-  + Download the PIL source, typically called `Imaging-x.x.x.tar.gz` where x.x.x is the version number
+  + Download the PIL source, typically called `Imaging-x.x.x.tar.gz` where `x.x.x` is the version number
   + Unpack this to a convenient location
-  + Open a command prompt and browse to folder `Imaging-x.x.x` (containing the setup.py file)
+  + Open a command prompt and browse to folder `Imaging-x.x.x` (containing the `setup.py` file)
   + At the command prompt enter:
 
             abaqus python setup.py install
@@ -157,7 +157,7 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 <tr>
 <td>Inputs</td>
 <td>Step list</td>
-<td>A list of steps to be analysed i.e. 1,2,3. A virtual x-ray is created for the last frame of each step in this list. If only a single step is required, must still contain a comma.</td>
+<td>A list of steps to be analysed i.e. 1, 2, 3. A virtual x-ray is created for the last frame of each step in this list.</td>
 </tr>
 <tr>
 <td></td>
@@ -177,22 +177,22 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 <tr>
 <td></td>
 <td>Approx size of x-ray images</td>
-<td>Some scaling of images is performed to make the number of pixels along the largest image dimension equal to this value</td>
+<td>Resizing of images is performed to make the number of pixels along the largest image dimension equal to this value.</td>
 </tr>
 <tr>
 <td></td>
 <td>Image file format</td>
-<td>Output format of images. Options are png, jpeg, and bmp </td>
+<td>Output format of images. Options are bmp, jpeg and png.</td>
 </tr>
 <tr>
 <td></td>
 <td>Smooth images</td>
-<td>Turn on image smoothing</td>
+<td>Turn on image smoothing. PIL.ImageFilter.SMOOTH is used to perform the smoothing.</td>
 </tr>
 <tr>
 <td></td>
 <td>Manual scaling of images</td>
-<td>pyvXRAY scales the mapped bone density values when creating the virtual x-ray images. The image files are 24-bit (or 8-bit for each RGB channel), so the gray scale range is essentially 0-255. The scale factor used ensures that this range is fully utilised and that none of the images in the series are over-exposed. Activating this option reports the scale factors used and gives the user the ability to change these values. This may be desirable when comparing virtual x-rays from different models; an equal comparison is possible only if the same scale factors are used for both. </td>
+<td>pyvXRAY scales the mapped bone density values when creating the virtual x-ray images. The image files are 24-bit (or 8-bit per channel), so the gray scale range is essentially 0-255. The scale factor used ensures that this range is fully utilised and that none of the images in the series are over-exposed. Activating this option reports the scale factors used and gives the user the ability to change these values. This may be desirable when comparing virtual x-rays from different models; an equal comparison is possible only if the same scale factors are used for both. </td>
 </tr>
 </table>
 

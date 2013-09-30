@@ -68,9 +68,9 @@ def createTransformationMatrix(Ma,Mb,Vab,rel='a'):
 # ~~~~~~~~~~ 
 
 def getTMfromCsys(odb,csysName):
-    # NOTE: Need to have a drop down list of available coordinates systems, similar to the 
-    #       csys manager. Then we will know before hand if the sys is a session csys or odb csys
-    if csysName==None: return None
+    if csysName=='GLOBAL': return None
+    # Parse coordinate system name
+    csysName = csysName.split(r'(')[0].strip()
     # Get ABAQUS datumCsys
     lcsys = None
     # Check odb csyses
@@ -245,9 +245,8 @@ def createVirtualXrays(bPartName,bSetName,BMDfoname,showImplant,iPartName,iSetNa
     
     # Process inputs    
     resGrid           = float(resGrid)
-    stepList          = eval(stepList)
+    stepList          = [int(s) for s in stepList.replace(',',' ').split()]
     preferredXraySize = int(preferredXraySize)
-    imageFormat       = imageFormat.strip()
         
     # Set variables
     dx,dy,dz  = (resGrid,)*3
@@ -274,7 +273,6 @@ def createVirtualXrays(bPartName,bSetName,BMDfoname,showImplant,iPartName,iSetNa
     
     # Get transformation matrix to convert from global to local coordinate system
     TM = getTMfromCsys(odb,csysName)
-    if TM is None: csysName = 'the global csys'
     print 'X-ray views will be relative to %s' % csysName
 
     # Get part data and create a bounding box. The bounding box should include the implant if specified
