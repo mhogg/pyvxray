@@ -57,9 +57,9 @@ The ABAQUS GUI is built on Python, and has its own Python installation. This Pyt
 
 * _Installation from source_
 
-  + Download the latest pyvXRAY source, typically called `pyvXRAY-x.x.x.zip` or `pyvXRAY-x.x.x.tar.gz`, where x.x.x is the version number
+  + Download the latest pyvXRAY source, typically called `pyvXRAY-x.x.x.zip` or `pyvXRAY-x.x.x.tar.gz`, where `x.x.x` is the version number
   + Unpack this to a convenient location
-  + Open a command prompt and browse to directory pyvXRAY-x.x.x (containing file setup.py)
+  + Open a command prompt and browse to directory `pyvXRAY-x.x.x` (containing file `setup.py`)
   + Run the following command:
 
             abaqus python setup.py build_ext --inplace
@@ -81,9 +81,9 @@ Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python,
 
 * _Install PIL from source (on Windows this requires Microsoft C++ to be installed)_
 
-  + Download the PIL source, typically called `Imaging-x.x.x.tar.gz` where x.x.x is the version number
+  + Download the PIL source, typically called `Imaging-x.x.x.tar.gz` where `x.x.x` is the version number
   + Unpack this to a convenient location
-  + Open a command prompt and browse to folder `Imaging-x.x.x` (containing the setup.py file)
+  + Open a command prompt and browse to folder `Imaging-x.x.x` (containing the `setup.py` file)
   + At the command prompt enter:
 
             abaqus python setup.py install
@@ -177,17 +177,17 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 <tr>
 <td></td>
 <td>Approx size of x-ray images</td>
-<td>Some scaling of images is performed to make the number of pixels along the largest image dimension equal to this value</td>
+<td>Resizing of images is performed to make the number of pixels along the largest image dimension equal to this value.</td>
 </tr>
 <tr>
 <td></td>
 <td>Image file format</td>
-<td>Output format of images. Options are png, jpeg, and bmp </td>
+<td>Output format of images. Options are bmp, jpeg and png.</td>
 </tr>
 <tr>
 <td></td>
 <td>Smooth images</td>
-<td>Turn on image smoothing</td>
+<td>Turn on image smoothing. PIL.ImageFilter.SMOOTH is used to perform the smoothing.</td>
 </tr>
 <tr>
 <td></td>
