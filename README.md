@@ -23,7 +23,7 @@ For building cython modules from source (e.g. if not using releases with pre-bui
 
 1.  ABAQUS is a commerical software package and requires a license from [Simulia](http://www.3ds.com/products-services/simulia/overview/)
 2.  The authors of pyvXRAY are not associated with ABAQUS/Simulia 
-3.  Python and numpy are heavily used by pyvXRAY. These are built in to ABAQUS. All of the last few releases (v6.11-v6.13) use Python 2.6 and numpy 1.4
+3.  Python and numpy are heavily used by pyvXRAY. These are built in to ABAQUS. All of the last few releases (v6.11 - v6.13) use Python 2.6.x and numpy 1.4.x
 
 ### Model setup requirements
 
