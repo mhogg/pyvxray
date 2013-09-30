@@ -67,11 +67,10 @@ class PyvXRAY_plugin(AFXForm):
 
     def getFirstDialog(self):
         """Create the dialog box"""
-        
         # Get odb information to populate the dialog box
         self.getOdb() 
-        self.getCsyses()    
-
+        self.getCsyses()
+        # Create dialog box
         import pyvXRAYDB
         return pyvXRAYDB.PyvXRAYDB(self)
 
@@ -163,7 +162,7 @@ class PyvXRAY_plugin(AFXForm):
             return False
         
         # Check for numpy
-        try: import numpy
+        try: import numpy as np
         except: 
             showAFXErrorDialog( self.getCurrentDialog(), 'Error: Required module numpy cannot be found' )
             return False   
@@ -198,5 +197,5 @@ toolset.registerGuiMenuButton(
     version=__version__,
     author='Michael Hogg',
     description=desc,
-    helpUrl='https://code.google.com/p/pyvxray/'
+    helpUrl='https://github.com/mhogg/pyvxray'
 )
