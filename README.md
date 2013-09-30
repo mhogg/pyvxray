@@ -157,7 +157,7 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 <tr>
 <td>Inputs</td>
 <td>Step list</td>
-<td>A list of steps to be analysed i.e. 1,2,3. A virtual x-ray is created for the last frame of each step in this list. If only a single step is required, must still contain a comma.</td>
+<td>A list of steps to be analysed i.e. 1, 2, 3. A virtual x-ray is created for the last frame of each step in this list.</td>
 </tr>
 <tr>
 <td></td>
@@ -192,7 +192,7 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 <tr>
 <td></td>
 <td>Manual scaling of images</td>
-<td>pyvXRAY scales the mapped bone density values when creating the virtual x-ray images. The image files are 24-bit (or 8-bit for each RGB channel), so the gray scale range is essentially 0-255. The scale factor used ensures that this range is fully utilised and that none of the images in the series are over-exposed. Activating this option reports the scale factors used and gives the user the ability to change these values. This may be desirable when comparing virtual x-rays from different models; an equal comparison is possible only if the same scale factors are used for both. </td>
+<td>pyvXRAY scales the mapped bone density values when creating the virtual x-ray images. The image files are 24-bit (or 8-bit per channel), so the gray scale range is essentially 0-255. The scale factor used ensures that this range is fully utilised and that none of the images in the series are over-exposed. Activating this option reports the scale factors used and gives the user the ability to change these values. This may be desirable when comparing virtual x-rays from different models; an equal comparison is possible only if the same scale factors are used for both. </td>
 </tr>
 </table>
 
