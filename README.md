@@ -64,7 +64,7 @@ The ABAQUS GUI is built on Python, and has its own Python installation. This Pyt
 
             abaqus python setup.py build_ext --inplace
 
-      which will build the cython modules
+      which will build the Cython modules. If Cython is available, it will be used; otherwise the .c files previously generated using Cython will be compiled directly.
   + Copy the pyvXRAY sub-folder to the `abaqus_plugins` directory within your ABAQUS installation, following the instructions above for pre-built distribution 
 
 ####2. Installation of pyvXRAY dependencies
