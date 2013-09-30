@@ -28,8 +28,8 @@ For building cython modules from source (e.g. if not using releases with pre-bui
 ### Model setup requirements
 
 * The model must contain only linear or quadrilateral tetrahedral elements (ABAQUS element types C3D4 and C3D10, respectively)
-* The model must have a scalar fieldoutput variable representing bone density. This is typically a state variable such as SDV1
-* This scalar variable must be available in the last frame of each step to be analysed, as only the last frame is used.
+* The model must have a scalar fieldoutput variable representing bone density. This is typically a state variable such as SDV1. 
+  This scalar variable must be available in the last frame of each step to be analysed, as only the last frame is used.
 
 **LIMITATIONS:**
 
@@ -37,11 +37,9 @@ For building cython modules from source (e.g. if not using releases with pre-bui
 
 ## Installation
 
-pyvXRAY is an ABAQUS plug-in. ABAQUS plug-ins may be installed in several ways. Only one of the ways is discussed here. For other options the user is referred to the ABAQUS user manuals.
-
-The ABAQUS GUI is built on Python, and has its own Python installation. This Python installation is not the typically Python setup, so some guidance is provided here on how to install pyvXRAY's dependencies.
-
 ####1. Installation of pyvXRAY plug-in
+
+pyvXRAY is an ABAQUS plug-in. ABAQUS plug-ins may be installed in several ways. Only one of the ways is discussed here. For other options the user is referred to the ABAQUS user manuals.
 
 * _Releases with pre-built modules_
 
@@ -68,6 +66,8 @@ The ABAQUS GUI is built on Python, and has its own Python installation. This Pyt
   + Copy the pyvXRAY sub-folder to the `abaqus_plugins` directory within your ABAQUS installation, following the instructions above for pre-built distribution 
 
 ####2. Installation of pyvXRAY dependencies
+
+The ABAQUS GUI is built on Python, and has its own Python installation. This Python installation is not the typically Python setup, so some guidance is provided here on how to install pyvXRAY's dependencies.
 
 Currently pyvXRAY has only one dependency that is not part of the ABAQUS Python, which is PIL / Pillow (NOTE: Pillow is a PIL fork that appears to have largely superseded PIL). 
 On Windows it is easiest to install PIL / Pillow using a binary installer, particularly because PIL / Pillow have many dependencies. There are currently several issues with this:
@@ -177,7 +177,7 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 <tr>
 <td>X-ray settings</td>
 <td>Base name of xray file(s)</td>
-<td>This is the base or root name of the virtual x-ray image files. These are labelled <code>basename_stepnumber_projection</code> i.e. <code>basename_1_XY</code> for Step 1 projected onto the X-Y plane</td>
+<td>This is the base or root name of the virtual x-ray image files. That is, image files are labelled <code>basename_projection_stepnumber</code> i.e. <code>basename_XY_1</code> for the X-Y projection from Step 1.</td>
 </tr>
 <tr>
 <td></td>
