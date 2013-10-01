@@ -208,20 +208,24 @@ cdef int TestPointInLinearTetElem(double[::1] X2, double[::1] G, double[:,::1] n
     tol=1.0e-6; lowLim=0.0-tol; uppLim=1.0+tol 
        
     G[0]=0.0; G[1]=0.0; G[2]=0.0
-    CLinearTetShapeFuncMatrix(G,N)
-    # nv(3x4) x N(4,1) = X1(3x1)
-    result = MatVecMult(nv,N,4,X1,3)  
-    for i in range(3):
-        dX[i] = X2[i]-X1[i]  
-                  
-    CLinearTetShapeFuncDerivMatrix(G,dNdG)
-    # nv(3x4) x dNdG(4,3) = JM(3x3)    
-    result = MatMult(nv,dNdG,JM)
+    
+    # Run this twice to ensure that error is reduced and an intersection can be found
+    for j in range(2):
 
-    # Solve system of linear equations, Dx = J Dg
-    result = SolveLinearEquations(JM,dX)
-    for i in range(3): 
-        G[i] += dX[i] 
+        CLinearTetShapeFuncMatrix(G,N)
+        # nv(3x4) x N(4,1) = X1(3x1)
+        result = MatVecMult(nv,N,4,X1,3)  
+        for i in range(3):
+            dX[i] = X2[i]-X1[i]  
+                  
+        CLinearTetShapeFuncDerivMatrix(G,dNdG)
+        # nv(3x4) x dNdG(4,3) = JM(3x3)    
+        result = MatMult(nv,dNdG,JM)
+
+        # Solve system of linear equations, Dx = J Dg
+        result = SolveLinearEquations(JM,dX)
+        for i in range(3): 
+            G[i] += dX[i] 
         
     # Test if point lies within tet element                    
     if((G[0]+G[1]+G[2])<=uppLim          and \
