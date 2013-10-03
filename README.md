@@ -47,11 +47,11 @@ pyvXRAY is an ABAQUS plug-in. ABAQUS plug-ins may be installed in several ways. 
   + Unpack this to a convenient location
   + Copy the pyvXRAY sub-folder to the `abaqus_plugins` directory within your ABAQUS installation. The location of this directory depends on your ABAQUS version. Some possible locations are:
 
-      v6.11-1: `C:\SIMULIA\Abaqus\6.11-1\abaqus_plugins`
+      v6.11-x: `C:\SIMULIA\Abaqus\6.11-x\abaqus_plugins`
 
-      v6.12-1: `C:\SIMULIA\Abaqus\6.12-1\code\python\lib\abaqus_plugins`
+      v6.12-x: `C:\SIMULIA\Abaqus\6.12-x\code\python\lib\abaqus_plugins`
 
-      v6.13-1: `C:\SIMULIA\Abaqus\6.13-1\code\python\lib\abaqus_plugins`
+      v6.13-x: `C:\SIMULIA\Abaqus\6.13-x\code\python\lib\abaqus_plugins`
 
 * _Installation from source_
 
@@ -94,16 +94,18 @@ Given these limitations, there are two obvious choices for installating PIL / Pi
 
 * _Edit the Windows registry and use a binary installer (Windows only)_
 
-  By editing the Windows registry the binary installers will be able to detect the ABAQUS Python version and install as usual. Use caution when editing the Windows registry or backup your registry before hand.
+  By editing the Windows registry the binary installers will be able to detect the ABAQUS Python version and install as usual. Use caution when editing the Windows registry or backup your 
+  registry before hand.
 
-  You need to create registry entry `HKEY_LOCAL_MACHINE\Software\Python\Pythoncore\2.6\InstallPath` and make its value that of your ABAQUS Python directory location. Registry key `HKEY_CURRENT_USER` also works. 
+  You need to create registry entry `HKEY_LOCAL_MACHINE\Software\Python\Pythoncore\2.6\InstallPath` and make its value that of your ABAQUS Python directory location. Registry key 
+  `HKEY_CURRENT_USER` also works. 
   This location depends on the ABAQUS version. For the default ABAQUS installation location, possible locations are:
 
-      v6.11-1: `C:\\SIMULIA\\Abaqus\\6.11-1\\External\\Python`
+      v6.11-x: `C:\\SIMULIA\\Abaqus\\6.11-x\\External\\Python`
      
-      v6.12-1: `C:\\SIMULIA\\Abaqus\\6.12-1\\tools\\SMApy`
+      v6.12-x: `C:\\SIMULIA\\Abaqus\\6.12-x\\tools\\SMApy`
      
-      v6.13-1: `C:\\SIMULIA\\Abaqus\\6.13-1\\tools\\SMApy\\python2.6`
+      v6.13-x: `C:\\SIMULIA\\Abaqus\\6.13-x\\tools\\SMApy\\python2.6`
 
   Editing the Windows registry can be done using the regedit utility.
 
@@ -152,7 +154,8 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 <tr>
 <td></td>
 <td>Implant: Set name</td>
-<td>The element set in the part instance representing the implant. If the entire part instance is an implant, then an element set containing all the elements in the part instance is needed.</td>
+<td>The element set in the part instance representing the implant. If the entire part instance is an implant, then an element set containing all the elements in the part instance 
+is needed.</td>
 </tr>
 <tr>
 <td></td>
@@ -167,17 +170,20 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 <tr>
 <td></td>
 <td>Coordinate system</td>
-<td>The name of the coordinate system used to create the projections. By default this is the global coordinate system. However, the views can be changed by creating a new coordinate system in ABAQUS and using it instead.</td>
+<td>The name of the coordinate system used to create the projections. By default this is the global coordinate system. However, the views can be changed by creating a new coordinate 
+system in ABAQUS and using it instead.</td>
 </tr>
 <tr>
 <td></td>
 <td>Mapping resolution (mm)</td>
-<td>pyvXRAY works by mapping the results of the bone density variable onto a regular grid. The mapping resolution is the cell spacing of this regular grid. Decreasing this number increases the accuracy of the mapping, but also increases the calculation time. As a first pass, a value of around 2mm is recommended to ensure that all the inputs are correct.</td>
+<td>pyvXRAY works by mapping the results of the bone density variable onto a regular grid. The mapping resolution is the cell spacing of this regular grid. Decreasing this number 
+increases the accuracy of the mapping, but also increases the calculation time. As a first pass, a value of around 2mm is recommended to ensure that all the inputs are correct.</td>
 </tr>
 <tr>
 <td>X-ray settings</td>
 <td>Base name of xray file(s)</td>
-<td>This is the base or root name of the virtual x-ray image files. That is, image files are labelled <code>basename_projection_stepnumber</code> i.e. <code>basename_XY_1</code> for the X-Y projection from Step 1.</td>
+<td>This is the base or root name of the virtual x-ray image files. That is, image files are labelled <code>basename_projection_stepnumber</code> i.e. <code>basename_XY_1</code> for 
+the X-Y projection from Step 1.</td>
 </tr>
 <tr>
 <td></td>
@@ -197,7 +203,10 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 <tr>
 <td></td>
 <td>Manual scaling of images</td>
-<td>pyvXRAY scales the mapped bone density values when creating the virtual x-ray images. The image files are 24-bit (or 8-bit per channel), so the gray scale range is essentially 0-255. The scale factor used ensures that this range is fully utilised and that none of the images in the series are over-exposed. Activating this option reports the scale factors used and gives the user the ability to change these values. This may be desirable when comparing virtual x-rays from different models; an equal comparison is possible only if the same scale factors are used for both. </td>
+<td>pyvXRAY scales the mapped bone density values when creating the virtual x-ray images. The image files are 24-bit (or 8-bit per channel), so the gray scale range is essentially 0-255. 
+The scale factor used ensures that this range is fully utilised and that none of the images in the series are over-exposed. Activating this option reports the scale factors used and gives 
+the user the ability to change these values. This may be desirable when comparing virtual x-rays from different models; an equal comparison is possible only if the same scale factors are 
+used for both. </td>
 </tr>
 </table>
 
