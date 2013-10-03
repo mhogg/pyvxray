@@ -22,6 +22,7 @@ class PyvXRAY_plugin(AFXForm):
 
         self.odb          = None    
         self.csysList     = None         
+        self.stepList     = None
         self.imageFormats = ['bmp','jpeg','png']
         
         # Keyword definitions
@@ -34,7 +35,7 @@ class PyvXRAY_plugin(AFXForm):
         self.iPartNameKw         = AFXStringKeyword(self.cmd, 'iPartName', True, 'PART-1-1')
         self.iSetNameKw          = AFXStringKeyword(self.cmd, 'iSetName', True, 'IMPLANT')
         self.iDensityKw          = AFXFloatKeyword(self.cmd,  'iDensity', True, 4500)
-        self.stepListKw          = AFXStringKeyword(self.cmd, 'stepList', True, '1, 2, 3')
+        self.stepListKw          = AFXStringKeyword(self.cmd, 'stepList', True, '')
         self.csysNameKw          = AFXStringKeyword(self.cmd, 'csysName', True, '')
         self.resGridKw           = AFXFloatKeyword(self.cmd,  'resGrid', True, 2)
         self.imageNameBaseKw     = AFXStringKeyword(self.cmd, 'imageNameBase', True, 'vxray')
@@ -63,13 +64,23 @@ class PyvXRAY_plugin(AFXForm):
         if self.odb != None:
             for csysName,csys in self.odb.rootAssembly.datumCsyses.items():
                 if csys.type==CARTESIAN: 
-                    self.csysList['ODB'].append(csysName)        
+                    self.csysList['ODB'].append(csysName)  
+
+    def getSteps(self):
+        """Get list of all available steps"""
+        if self.odb==None: return
+        self.stepList=[]
+        for stepName in self.odb.steps.keys():
+            stepNumber = stepName.split('-')[-1]
+            self.stepList.append(stepNumber)
+        return      
 
     def getFirstDialog(self):
         """Create the dialog box"""
         # Get odb information to populate the dialog box
         self.getOdb() 
         self.getCsyses()
+        self.getSteps()
         # Create dialog box
         import pyvXRAYDB
         return pyvXRAYDB.PyvXRAYDB(self)

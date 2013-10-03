@@ -13,7 +13,7 @@ MIT license - See pyvxray/LICENSE.txt for details on usage and redistribution
 ### Software requirements
 
 * ABAQUS >= 6.11
-* Python Image Library (PIL) >= 1.1.6 OR Pillow >= 2.2.0 (to be released)
+* Python Image Library (PIL) >= 1.1.6 OR Pillow >= 2.2.0
 
 For building cython modules from source (e.g. if not using releases with pre-built modules):
 * A C compiler. Using ABAQUS Python on Windows requires Microsoft C++. Can use other compilers (i.e. mingw32) if you have a separate Python installation.
