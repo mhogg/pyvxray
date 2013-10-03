@@ -410,8 +410,10 @@ cdef int CQuadTetShapeFuncDerivMatrix(double[::1] ipc, double[:,::1] dNdG):
     
             
 cdef int SolveLinearEquations(double[:,::1] A, double b[]):
+
     """Solves a system of linear equations, Ax=b, using Gaussian elimination
     with partial pivoting. A must be a square matrix. Both A and b are modified"""
+
     cdef int i,j,k,m,n,pvtStore
     cdef double pvt,temp
     m = A.shape[1]; n = A.shape[0]

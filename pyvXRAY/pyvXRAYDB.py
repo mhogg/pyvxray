@@ -16,7 +16,7 @@ class PyvXRAYDB(AFXDataDialog):
     def __init__(self, form):
 
         # Construct the base class.
-        AFXDataDialog.__init__(self, form, 'Create virtual x-rays',self.OK|self.CANCEL, DIALOG_ACTIONS_SEPARATOR)
+        AFXDataDialog.__init__(self, form, 'pyvXRAY - Create virtual x-rays',self.OK|self.CANCEL, DIALOG_ACTIONS_SEPARATOR)
         self.form = form
         
         okBtn = self.getActionButton(self.ID_CLICKED_OK)
@@ -52,6 +52,7 @@ class PyvXRAYDB(AFXDataDialog):
         GroupBox_3 = FXGroupBox(p=TabItem_2, text='Required inputs', opts=FRAME_GROOVE|LAYOUT_FILL_X|LAYOUT_FILL_Y)
         VAligner_3 = AFXVerticalAligner(p=GroupBox_3, opts=0, x=0, y=0, w=0, h=0, pl=0, pr=0, pt=10, pb=10)
         AFXTextField(p=VAligner_3, ncols=21, labelText='Step list:', tgt=form.stepListKw, sel=0, pt=5, pb=5)
+        form.stepListKw.setValue(', '.join(form.stepList))
         
         ComboBox_1 = AFXComboBox(p=VAligner_3, ncols=19, nvis=1, text='Coordinate system:', tgt=form.csysNameKw, sel=0, pt=5, pb=5)
         csyses = []
