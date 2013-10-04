@@ -68,8 +68,8 @@ class PyvXRAY_plugin(AFXForm):
 
     def getSteps(self):
         """Get list of all available steps"""
-        if self.odb==None: return
         self.stepList=[]
+        if self.odb==None: return
         for stepName in self.odb.steps.keys():
             stepNumber = stepName.split('-')[-1]
             self.stepList.append(stepNumber)
