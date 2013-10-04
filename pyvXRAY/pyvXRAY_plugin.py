@@ -5,7 +5,7 @@
 # This file is part of pyvXRAY - See LICENSE.txt for information on usage and redistribution
 
 from abaqusGui import *
-from abaqusConstants import ALL, CARTESIAN
+from abaqusConstants import ALL, CARTESIAN, SCALAR, INTEGRATION_POINT, CENTROID, ELEMENT_NODAL
 import os
 from version import version as __version__
 # Required to ensure the CSYS list is up to date
@@ -23,17 +23,20 @@ class PyvXRAY_plugin(AFXForm):
         self.odb          = None    
         self.csysList     = None         
         self.stepList     = None
+        self.elementSets  = None
+        self.scalarList   = None
         self.imageFormats = ['bmp','jpeg','png']
+        self.suppLocs     = [INTEGRATION_POINT, CENTROID, ELEMENT_NODAL]
         
         # Keyword definitions
         self.radioButtonGroups   = {}
         self.cmd                 = AFXGuiCommand(mode=self, method='createVirtualXrays',objectName='virtualXrays', registerQuery=False)
-        self.bPartNameKw         = AFXStringKeyword(self.cmd, 'bPartName', True, 'PART-1-1')
-        self.bSetNameKw          = AFXStringKeyword(self.cmd, 'bSetName', True, 'BONE')
-        self.BMDfonameKw         = AFXStringKeyword(self.cmd, 'BMDfoname', True, 'SDV1')
+        self.odbNameKw           = AFXStringKeyword(self.cmd, 'odbName', True, '')
+        self.bSetNameKw          = AFXStringKeyword(self.cmd, 'bSetName', True, '')
+        self.BMDfonameKw         = AFXStringKeyword(self.cmd, 'BMDfoname', True, '')
         self.showImplantKw       = AFXBoolKeyword(self.cmd,   'showImplant', AFXBoolKeyword.TRUE_FALSE, True, False)
-        self.iPartNameKw         = AFXStringKeyword(self.cmd, 'iPartName', True, 'PART-1-1')
-        self.iSetNameKw          = AFXStringKeyword(self.cmd, 'iSetName', True, 'IMPLANT')
+        self.iPartNameKw         = AFXStringKeyword(self.cmd, 'iPartName', True, '')
+        self.iSetNameKw          = AFXStringKeyword(self.cmd, 'iSetName', True, '')
         self.iDensityKw          = AFXFloatKeyword(self.cmd,  'iDensity', True, 4500)
         self.stepListKw          = AFXStringKeyword(self.cmd, 'stepList', True, '')
         self.csysNameKw          = AFXStringKeyword(self.cmd, 'csysName', True, '')
@@ -43,14 +46,34 @@ class PyvXRAY_plugin(AFXForm):
         self.imageFormatKw       = AFXStringKeyword(self.cmd, 'imageFormat', True, self.imageFormats[-1])
         self.smoothKw            = AFXBoolKeyword(self.cmd,   'smooth', AFXBoolKeyword.TRUE_FALSE, True, True)
         self.manualScalingKw     = AFXBoolKeyword(self.cmd,   'manualImageScaling', AFXBoolKeyword.TRUE_FALSE, True, False)
+                   
+    def getOdbList(self):
+        """Get a list of all available odbs in session"""
+        self.odbList = session.odbs.keys()
         
-    def getOdb(self):
-        """Get the odb in the current viewport"""
-        displayedType = getDisplayedObjectType()        
-        if displayedType==ODB:
-            self.odb = session.viewports[session.currentViewportName].displayedObject
-        else:
-            self.odb = None 
+    def getFirstOdb(self):
+        """Set first odb in first Dialog Box"""
+        if self.odbList==None or len(self.odbList)==0: return
+        self.setOdb(self.odbList[0])
+
+    def setOdb(self,odbName):
+        """Set odb from name"""
+        if odbName=='': return
+        self.odb = session.odbs[odbName]   
+
+    def getElementSetList(self):
+        """Get list of all element sets in the current odb"""
+        self.elementSets=[]
+        if self.odb==None: return
+        # Check part instances
+        for instName,inst in self.odb.rootAssembly.instances.items():
+            self.elementSets.append('.'.join([instName,'ALL']))
+            for setName in inst.elementSets.keys():
+                self.elementSets.append('.'.join([instName,setName]))
+        # Check assembly            
+        for setName in self.odb.rootAssembly.elementSets.keys():
+            self.elementSets.append(setName)
+        self.elementSets.sort()         
         
     def getCsyses(self): 
         """Get list of all available csyses"""
@@ -74,13 +97,32 @@ class PyvXRAY_plugin(AFXForm):
             stepNumber = stepName.split('-')[-1]
             self.stepList.append(stepNumber)
         return      
+        
+    def getScalarList(self):
+        """Get list of available scalars"""
+        self.scalarList=[]       
+        if self.odb==None: return
+        includeList={}; excludeList={}
+        for step in self.odb.steps.values():
+            frame = step.frames[-1]
+            for k in frame.fieldOutputs.keys():
+                if excludeList.has_key(k) or includeList.has_key(k): continue
+                v   = frame.fieldOutputs[k]               
+                loc = [True for loc in v.locations if loc.position in self.suppLocs]                
+                if any(loc) and v.type==SCALAR: includeList[k]=1
+                else: excludeList[k]=1
+        self.scalarList = includeList.keys()
+        self.scalarList.sort()
 
     def getFirstDialog(self):
         """Create the dialog box"""
         # Get odb information to populate the dialog box
-        self.getOdb() 
+        self.getOdbList()
+        self.getFirstOdb()
+        self.getElementSetList()
         self.getCsyses()
         self.getSteps()
+        self.getScalarList()
         # Create dialog box
         import pyvXRAYDB
         return pyvXRAYDB.PyvXRAYDB(self)
@@ -88,6 +130,7 @@ class PyvXRAY_plugin(AFXForm):
     def doCustomChecks(self):
         """Perform custom checks of inputs"""
     
+        """
         # Check that object in current viewport is an odb file       
         if self.odb==None:
             showAFXErrorDialog(self.getCurrentDialog(), 'Error: Object in current viewport is not an odb object')
@@ -120,7 +163,8 @@ class PyvXRAY_plugin(AFXForm):
                 return False               
             if iDensity<0:
                 showAFXErrorDialog(self.getCurrentDialog(), 'Error: Implant density must be greater than 0')
-                return False    
+                return False  
+        """
 
         # Check that values in stepList are valid. Also check that the values are in increasing order
         stepList = self.stepListKw.getValue()
