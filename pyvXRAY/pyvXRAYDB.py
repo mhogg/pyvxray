@@ -77,20 +77,10 @@ class PyvXRAYDB(AFXDataDialog):
         VAligner_4 = AFXVerticalAligner(p=GroupBox_4, opts=0, x=0, y=0, w=0, h=0, pl=0, pr=0, pt=10, pb=10)
         
         AFXTextField(p=VAligner_4, ncols=26, labelText='Step list:', tgt=form.stepListKw, sel=0, pt=5, pb=5)
-        form.stepListKw.setValue(', '.join(form.stepList))
+        self.popStepListComboBox()        
         
-        ComboBox_5 = AFXComboBox(p=VAligner_4, ncols=24, nvis=1, text='Coordinate system:', tgt=form.csysNameKw, sel=0, pt=5, pb=5)
-        csyses = []
-        for csysType,csysNames in form.csysList.items():
-            for csysName in csysNames:
-                listText = '%s (%s)' % (csysName,csysType)
-                csyses.append(listText)
-        csyses.sort()
-        csyses.insert(0,'GLOBAL') # Add global to the start of the sorted list
-        form.csysNameKw.setValue(csyses[0])
-        for csys in csyses:
-            ComboBox_5.appendItem(text=csys)
-        ComboBox_5.setMaxVisible(5)
+        self.ComboBox_5 = AFXComboBox(p=VAligner_4, ncols=24, nvis=1, text='Coordinate system:', tgt=form.csysNameKw, sel=0, pt=5, pb=5)
+        self.popCsysListComboBox()        
                 
         AFXTextField(p=VAligner_4, ncols=26, labelText='%-30s'%'Mapping resolution (mm):', tgt=form.resGridKw, sel=0, pt=5, pb=5)
 
@@ -138,22 +128,47 @@ class PyvXRAYDB(AFXDataDialog):
         for elementSet in self.form.elementSets:
             self.ComboBox_4.appendItem(elementSet)
         self.form.iSetNameKw.setValue(self.form.elementSets[0]) 
+        
+    def popStepListComboBox(self):
+        self.form.stepListKw.setValue(', '.join(self.form.stepList))
+    
+    def popCsysListComboBox(self):
+        self.ComboBox_5.clearItems()
+        csyses = []
+        for csysType,csysNames in self.form.csysList.items():
+            for csysName in csysNames:
+                listText = '%s (%s)' % (csysName,csysType)
+                csyses.append(listText)
+        csyses.sort()
+        csyses.insert(0,'GLOBAL') # Add global to the start of the sorted list
+        self.form.csysNameKw.setValue(csyses[0])
+        for csys in csyses:
+            self.ComboBox_5.appendItem(text=csys)
+        self.ComboBox_5.setMaxVisible(5) 
 
     def processUpdates(self):
         """Update form"""
         # If odb name changes, the re-populate the region list
         if self.form.odbNameKw.getValue() != self.odbName:
+            
             self.odbName = self.form.odbNameKw.getValue()
+            
             self.form.setOdb(self.odbName)
             self.form.getElementSetList()
+            self.form.getScalarList()
+            self.form.getSteps()
+            self.form.getCsyses()            
+            
             self.populateElementListComboBox() 
             self.populateElementListComboBoxImplant()
-            self.form.getScalarList()
             self.populateScalarListComboBox()
+            self.popStepListComboBox()
+            self.popCsysListComboBox()
         # Disable implant option if show implant not checked
         tfs = [self.tf1,self.ComboBox_4]
         if self.cb1.getCheck():
             for tf in tfs: tf.enable() 
         else: 
             for tf in tfs: tf.disable() 
-        return          
+        return       
+        

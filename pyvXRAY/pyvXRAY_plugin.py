@@ -30,10 +30,10 @@ class PyvXRAY_plugin(AFXForm):
         # Keyword definitions
         self.cmd                 = AFXGuiCommand(mode=self, method='createVirtualXrays',objectName='virtualXrays', registerQuery=False)
         self.odbNameKw           = AFXStringKeyword(self.cmd, 'odbName', True, '')
-        self.bSetNameKw          = AFXStringKeyword(self.cmd, 'bSetName', True, '')
+        self.bSetNameKw          = AFXStringKeyword(self.cmd, 'bRegionSetName', True, '')
         self.BMDfonameKw         = AFXStringKeyword(self.cmd, 'BMDfoname', True, '')
         self.showImplantKw       = AFXBoolKeyword(self.cmd,   'showImplant', AFXBoolKeyword.TRUE_FALSE, True, False)
-        self.iSetNameKw          = AFXStringKeyword(self.cmd, 'iSetName', True, '')
+        self.iSetNameKw          = AFXStringKeyword(self.cmd, 'iRegionSetName', True, '')
         self.iDensityKw          = AFXFloatKeyword(self.cmd,  'iDensity', True, 4500)
         self.stepListKw          = AFXStringKeyword(self.cmd, 'stepList', True, '')
         self.csysNameKw          = AFXStringKeyword(self.cmd, 'csysName', True, '')
