@@ -28,7 +28,6 @@ class PyvXRAY_plugin(AFXForm):
         self.suppLocs     = [INTEGRATION_POINT, CENTROID, ELEMENT_NODAL]
         
         # Keyword definitions
-        self.radioButtonGroups   = {}
         self.cmd                 = AFXGuiCommand(mode=self, method='createVirtualXrays',objectName='virtualXrays', registerQuery=False)
         self.odbNameKw           = AFXStringKeyword(self.cmd, 'odbName', True, '')
         self.bSetNameKw          = AFXStringKeyword(self.cmd, 'bSetName', True, '')
