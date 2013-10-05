@@ -234,9 +234,9 @@ def checkElementTypes(eTypes,partName):
     
 # ~~~~~~~~~~      
 
-def createVirtualXrays(bPartName,bSetName,BMDfoname,showImplant,iPartName,iSetName,
+def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetName,
                        iDensity,stepList,csysName,resGrid,imageNameBase,preferredXraySize,
-                       imageFormat,smooth,manualImageScaling=False):
+                       imageFormat,smooth=False,manualImageScaling=False):
     """Creates virtual x-rays from an ABAQUS odb file. The odb file should contain \n""" + \
     """a number of steps with a fieldoutput variable representing bone mineral density (BMD)"""
         
@@ -251,10 +251,7 @@ def createVirtualXrays(bPartName,bSetName,BMDfoname,showImplant,iPartName,iSetNa
     # Set variables
     dx,dy,dz  = (resGrid,)*3
     iDensity /= 1000.    
-
-    # Use odb in current viewport
-    vpname = session.currentViewportName
-    odb    = session.viewports[vpname].displayedObject 
+    odb       = session.odbs[odbName]
 
     # Get element information for each part. An error will be raised if 
     # unsupported elements are detected or a part is made up of more than one 
