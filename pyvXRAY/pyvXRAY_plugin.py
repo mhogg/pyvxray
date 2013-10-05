@@ -6,7 +6,6 @@
 
 from abaqusGui import *
 from abaqusConstants import ALL, CARTESIAN, SCALAR, INTEGRATION_POINT, CENTROID, ELEMENT_NODAL
-import os
 from version import version as __version__
 # Required to ensure the CSYS list is up to date
 from kernelAccess import session  
@@ -35,7 +34,6 @@ class PyvXRAY_plugin(AFXForm):
         self.bSetNameKw          = AFXStringKeyword(self.cmd, 'bSetName', True, '')
         self.BMDfonameKw         = AFXStringKeyword(self.cmd, 'BMDfoname', True, '')
         self.showImplantKw       = AFXBoolKeyword(self.cmd,   'showImplant', AFXBoolKeyword.TRUE_FALSE, True, False)
-        self.iPartNameKw         = AFXStringKeyword(self.cmd, 'iPartName', True, '')
         self.iSetNameKw          = AFXStringKeyword(self.cmd, 'iSetName', True, '')
         self.iDensityKw          = AFXFloatKeyword(self.cmd,  'iDensity', True, 4500)
         self.stepListKw          = AFXStringKeyword(self.cmd, 'stepList', True, '')
@@ -99,7 +97,7 @@ class PyvXRAY_plugin(AFXForm):
         return      
         
     def getScalarList(self):
-        """Get list of available scalars"""
+        """Get list of available scalars. Check last frame in all steps"""
         self.scalarList=[]       
         if self.odb==None: return
         includeList={}; excludeList={}
@@ -130,53 +128,57 @@ class PyvXRAY_plugin(AFXForm):
     def doCustomChecks(self):
         """Perform custom checks of inputs"""
     
-        """
-        # Check that object in current viewport is an odb file       
-        if self.odb==None:
-            showAFXErrorDialog(self.getCurrentDialog(), 'Error: Object in current viewport is not an odb object')
+        # Check that odb exists
+        self.getOdbList()
+        if self.odbNameKw.getValue() not in self.odbList:
+            showAFXErrorDialog(self.getCurrentDialog(), 'Error: Odb %s does not exist' % self.modelNameKw.getValue())
             return False    
-
-        # Check that the selected bone region and element set exists
-        bPartName = self.bPartNameKw.getValue()
-        bSetName  = self.bSetNameKw.getValue()
-        if bPartName not in self.odb.rootAssembly.instances.keys():
-            showAFXErrorDialog(self.getCurrentDialog(), 'Error: %s is not a part instance in the current odb' % bPartName)
-            return False
-        if bSetName not in self.odb.rootAssembly.instances[bPartName].elementSets.keys():
-            showAFXErrorDialog(self.getCurrentDialog(), 'Error: %s is not an element set in part instance %s' % (bSetName,bPartName))
-            return False
+    
+        # Check that bone region exists in model
+        self.getElementSetList() 
+        if self.bSetNameKw.getValue() not in self.elementSets:
+            showAFXErrorDialog(self.getCurrentDialog(), 'Error: Bone region %s does not exist' % self.bSetNameKw.getValue())
+            return False 
             
-        # If user has requested the implant to be displayed, then check the selected implant region and element set exists
-        if self.showImplantKw.getValue():
-            iPartName = self.iPartNameKw.getValue()
-            iSetName  = self.iSetNameKw.getValue()
-            iDensity  = self.iDensityKw.getValue()
-            if iPartName not in self.odb.rootAssembly.instances.keys():
-                showAFXErrorDialog(self.getCurrentDialog(), 'Error: %s is not a part instance in the current odb' % iPartName)
+        # If implant is requested, check implant inputs
+        if self.showImplantKw.getValue():   
+            # Check implant region
+            self.getElementSetList() 
+            if self.iSetNameKw.getValue() not in self.elementSets:
+                showAFXErrorDialog(self.getCurrentDialog(), 'Error: Implant region %s does not exist' % self.iSetNameKw.getValue())
                 return False 
-            if iSetName not in self.odb.rootAssembly.instances[iPartName].elementSets.keys():
-                showAFXErrorDialog(self.getCurrentDialog(), 'Error: %s is not an element set in part instance %s' % (iSetName,iPartName))
-                return False
+            # Check input density
+            iDensity  = self.iDensityKw.getValue()
             try: float(iDensity)
             except: 
-                showAFXErrorDialog(self.getCurrentDialog(), 'Error: Implant density value is not a number')
+                showAFXErrorDialog(self.getCurrentDialog(), 'Error: Implant density value is not a valid number')
                 return False               
             if iDensity<0:
                 showAFXErrorDialog(self.getCurrentDialog(), 'Error: Implant density must be greater than 0')
-                return False  
-        """
+                return False              
 
-        # Check that values in stepList are valid. Also check that the values are in increasing order
+        # Check that values in stepList are valid
         stepList = self.stepListKw.getValue()
         try: 
             stepList = [int(s) for s in stepList.replace(',',' ').split()]
         except: 
             showAFXErrorDialog(self.getCurrentDialog(), 'Error: Cannot convert step list values to integers')
             return False
-        diff = [True for i in range(len(stepList)-1) if stepList[i+1]-stepList[i]<0]
-        if len(diff)>0: 
-            showAFXErrorDialog(self.getCurrentDialog(), 'Error: Step numbers in step list not in increasing order' )
-            return False  
+        stepList.sort()
+            
+        # Check that all steps in step list exist and that density variable exists in all steps (last frame)
+        BMDfoname = self.BMDfonameKw.getValue()
+        stepInfo  = {}
+        for stepName,step in self.odb.steps.items():
+            stepNumber = int(stepName.split('-')[-1])
+            stepInfo[stepNumber] = step.frames[-1].fieldOutputs.keys()
+        for stepNumber in stepList:
+            if stepNumber not in stepInfo:
+                showAFXErrorDialog(self.getCurrentDialog(), 'Error: Step number %i is not available in odb' % stepNumber)
+                return False
+            if BMDfoname not in stepInfo[stepNumber]:
+                showAFXErrorDialog(self.getCurrentDialog(), 'Error: Density variable %s is not available in Step number %i' % (BMDfoname,stepNumber))
+                return False                 
     
         # Check mapping resolution, resGrid
         resGrid = self.resGridKw.getValue()
@@ -195,20 +197,6 @@ class PyvXRAY_plugin(AFXForm):
         if preferredXraySize < minXraySize:
             showAFXErrorDialog(self.getCurrentDialog(), 'Error: Minimum virtual x-ray image size is %i pixels' % minXraySize)
             return False   
-
-        # Check that all steps in step list exist and that density variable exists in all steps (last frame)
-        # NOTE: Do this last because it is the most time consuming
-        BMDfoname = self.BMDfonameKw.getValue()
-        stepInfo  = {}
-        for stepName,step in self.odb.steps.items():
-            stepInfo[step.number] = step.frames[-1].fieldOutputs.keys()
-        for stepNumber in stepList:
-            if stepNumber not in stepInfo:
-                showAFXErrorDialog(self.getCurrentDialog(), 'Error: Step number %i is not available in odb' % stepNumber)
-                return False
-            if BMDfoname not in stepInfo[stepNumber]:
-                showAFXErrorDialog(self.getCurrentDialog(), 'Error: Density variable %s is not available in Step number %i' % (BMDfoname,stepNumber))
-                return False
                 
         # Check for Abaqus version >= 6.11 
         majorNumber, minorNumber, updateNumber = getAFXApp().getVersionNumbers()
