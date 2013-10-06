@@ -10,6 +10,7 @@ from abaqusConstants import ELEMENT_NODAL
 from cythonMods import createElementMap, LinearTetInterpFunc, QuadTetInterpFunc
 import elementTypes as et
 import copy
+from odbAccess import OdbMeshElementType
 
 # Use try to prevent error importing missing modules when pyvXRAY plug-in is launched
 try:
@@ -250,9 +251,22 @@ def getElements(odb,regionSetName):
         
     # Get region set and elements
     region,setName = parseRegionSetName(regionSetName)
-    if setName=='ALL': setRegion = odb.rootAssembly.instances[region]
-    else:              setRegion = odb.rootAssembly.allSets[regionSetName]
-    elements = setRegion.elements
+    if region=='Assembly':
+        setRegion =  odb.rootAssembly.allSets[regionSetName]
+        if type(setRegion.elements[0])==OdbMeshElementType:       
+            elements = setRegion.elements        
+        else:
+            elements=[]
+            for elems in range(len(setRegion.elements)):
+                for e in elems:
+                    elements.append(e)
+    else:
+        if setName=='ALL':
+            setRegion = odb.rootAssembly.instances[region]
+            elements  = setRegion.elements
+        else:
+            setRegion = odb.rootAssembly.instances[region].elementSets[setName]
+            elements  = setRegion.elements
     
     # Get part information: (1) instance names, (2) element types and (3) number of each element type 
     partInfo={}
@@ -278,7 +292,7 @@ def getElements(odb,regionSetName):
         print '\nElement type%s %s in region %s %s not supported' % strvars
         return None
     
-    return partInfo, elements, setRegion
+    return partInfo, setRegion, elements
        
 # ~~~~~~~~~~      
 
@@ -408,10 +422,10 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
     NZ = int(np.ceil(lz/dz+1))
     z  = np.linspace(z0,zN,NZ)  
     
-    # Create element map for the implant, map tp 3D space array and then project onto 3 planes 
+    # Create element map for the implant, map to 3D space array and then project onto 3 planes 
     if showImplant: 
         # Get element map       
-        iElementMap  = createElementMap(iNodeList,iElemConnect['label'],iElemConnect['connectivity'],iNumNodesPerElem,x,y,z)        
+        iElementMap  = createElementMap(iNodeList,iElemData['label'],iElemData['econn'],iNumNodesPerElem,x,y,z)        
         # Mask 3D array
         iMask = np.zeros((NX,NY,NZ),dtype=np.float64)   
         for gpi in xrange(iElementMap.size):
@@ -438,7 +452,7 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
         writeImageFile('implant_XZ',iprojXZ,preferredXraySize,imageFormat,smooth)
 
     # Create the element map for the bone
-    bElementMap = createElementMap(bNodeList,bElemConnect['label'],bElemConnect['connectivity'],bNumNodesPerElem,x,y,z)
+    bElementMap = createElementMap(bNodeList,bElemData['label'],bElemData['econn'],bNumNodesPerElem,x,y,z)
     
     # Interpolate HU values from tet mesh onto grid using quadratic tet shape function
     # (a) Get HU values from frame
@@ -449,8 +463,8 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
     mappedBMD = np.zeros((NX,NY,NZ),dtype=np.float64)
         
     # Initialise BMDvalues         
-    BMDvalues = dict.fromkeys(elemData.keys(),{})
-    for instName,instData in elemData.items():
+    BMDvalues = dict.fromkeys(bElemData.keys(),{})
+    for instName,instData in bElemData.items():
         for etype,eData in instData.items():
             for i in xrange(eData.size): 
                 BMDvalues[instName][eData[i]['label']] = et.seTypes[etype]()
