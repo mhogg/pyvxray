@@ -150,15 +150,15 @@ class PyvXRAYDB(AFXDataDialog):
         """Update form"""
         # If odb name changes, the re-populate the region list
         if self.form.odbNameKw.getValue() != self.odbName:
-            
+            # Update odb name
             self.odbName = self.form.odbNameKw.getValue()
-            
+            # Get odb details
             self.form.setOdb(self.odbName)
             self.form.getElementSetList()
             self.form.getScalarList()
             self.form.getSteps()
             self.form.getCsyses()            
-            
+            # Re-populate combo boxes
             self.populateElementListComboBox() 
             self.populateElementListComboBoxImplant()
             self.populateScalarListComboBox()

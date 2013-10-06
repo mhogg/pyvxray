@@ -8,10 +8,12 @@ import os
 from abaqus import session, getInputs
 from abaqusConstants import ELEMENT_NODAL
 from cythonMods import createElementMap, LinearTetInterpFunc, QuadTetInterpFunc
+import elementTypes as et
+import copy
 
 # Use try to prevent error importing missing modules when pyvXRAY plug-in is launched
 try:
-    import numpy
+    import np
     from PIL import Image, ImageFilter
 except: pass
 
@@ -35,8 +37,8 @@ def convert1Dto3Dindex(index,NX,NY,NZ):
 
 def transformPoint(TM,point):
     """Transforms point using supplied transform"""
-    point = numpy.append(point,1.0)
-    return numpy.dot(TM,point)[:3]
+    point = np.append(point,1.0)
+    return np.dot(TM,point)[:3]
     
 # ~~~~~~~~~~      
 
@@ -52,18 +54,18 @@ def createTransformationMatrix(Ma,Mb,Vab,rel='a'):
     a1,a2,a3 = Ma
     b1,b2,b3 = Mb
     # Rotation matrix
-    R = numpy.identity(4,numpy.float)
-    R[0,0:3] = [numpy.dot(b1,a1), numpy.dot(b1,a2), numpy.dot(b1,a3)]
-    R[1,0:3] = [numpy.dot(b2,a1), numpy.dot(b2,a2), numpy.dot(b2,a3)]
-    R[2,0:3] = [numpy.dot(b3,a1), numpy.dot(b3,a2), numpy.dot(b3,a3)]    
+    R = np.identity(4,np.float)
+    R[0,0:3] = [np.dot(b1,a1), np.dot(b1,a2), np.dot(b1,a3)]
+    R[1,0:3] = [np.dot(b2,a1), np.dot(b2,a2), np.dot(b2,a3)]
+    R[2,0:3] = [np.dot(b3,a1), np.dot(b3,a2), np.dot(b3,a3)]    
     # Transformation matrix
     if rel=='b':
-        Vab = numpy.append(Vab,1.0)
-        Vab = numpy.dot(R.T,Vab)[0:3]
-    T = numpy.identity(4,numpy.float)     
+        Vab = np.append(Vab,1.0)
+        Vab = np.dot(R.T,Vab)[0:3]
+    T = np.identity(4,np.float)     
     T[0:3,3] = -Vab       
     # Transformation matrix
-    return numpy.dot(R,T)
+    return np.dot(R,T)
     
 # ~~~~~~~~~~ 
 
@@ -82,14 +84,14 @@ def getTMfromCsys(odb,csysName):
             lcsys = session.scratchOdbs[odb.path].rootAssembly.datumCsyses[csysName]
     if lcsys==None: return None
     # Global coordinate system
-    Og = numpy.zeros(3)
-    Mg = numpy.identity(3)
+    Og = np.zeros(3)
+    Mg = np.identity(3)
     # Local coordinate system
     Ol    = lcsys.origin
-    Ml    = numpy.zeros((3,3))
-    Ml[0] = lcsys.xAxis/numpy.linalg.norm(lcsys.xAxis) # NOTE: This should already be a unit vector
-    Ml[1] = lcsys.yAxis/numpy.linalg.norm(lcsys.yAxis) #       Shouldn't need to normalise
-    Ml[2] = lcsys.zAxis/numpy.linalg.norm(lcsys.zAxis)
+    Ml    = np.zeros((3,3))
+    Ml[0] = lcsys.xAxis/np.linalg.norm(lcsys.xAxis) # NOTE: This should already be a unit vector
+    Ml[1] = lcsys.yAxis/np.linalg.norm(lcsys.yAxis) #       Shouldn't need to normalise
+    Ml[2] = lcsys.zAxis/np.linalg.norm(lcsys.zAxis)
     # Create transformation matrix
     Vgl = Ol-Og
     TM  = createTransformationMatrix(Mg,Ml,Vgl,rel='a')
@@ -101,11 +103,11 @@ def projectXrayPlane(spaceArray3D,whichPlane):
     """Project 3D BMD data onto the specified plane"""
     # Perform the projection by summing along orthogonal axis    
     if whichPlane=='xy':
-        projected = numpy.sum(spaceArray3D,axis=2,dtype=spaceArray3D.dtype)
+        projected = np.sum(spaceArray3D,axis=2,dtype=spaceArray3D.dtype)
     elif whichPlane=='yz':
-        projected = numpy.sum(spaceArray3D,axis=0,dtype=spaceArray3D.dtype)
+        projected = np.sum(spaceArray3D,axis=0,dtype=spaceArray3D.dtype)
     elif whichPlane=='xz':
-        projected = numpy.sum(spaceArray3D,axis=1,dtype=spaceArray3D.dtype)   
+        projected = np.sum(spaceArray3D,axis=1,dtype=spaceArray3D.dtype)   
     return projected
 
 # ~~~~~~~~~~  
@@ -115,7 +117,7 @@ def writeImageFile(xrayImageFilename,BMDprojected,imageSize,imageFormat='bmp',sm
     
     # Convert to 8-bit
     xray = BMDprojected.copy()
-    xray = numpy.asarray(xray,dtype=numpy.int8)
+    xray = np.asarray(xray,dtype=np.int8)
 
     # Create image from array.
     xray = xray[:,::-1]       
@@ -123,11 +125,11 @@ def writeImageFile(xrayImageFilename,BMDprojected,imageSize,imageFormat='bmp',sm
     
     # Resize image
     xsize,ysize = xrayImage.size    
-    bigSide = numpy.argmax(xrayImage.size)
+    bigSide = np.argmax(xrayImage.size)
     if bigSide==0: scale = float(imageSize)/xsize
     else:          scale = float(imageSize)/ysize
-    xsize = int(numpy.rint(scale*xsize))
-    ysize = int(numpy.rint(scale*ysize))  
+    xsize = int(np.rint(scale*xsize))
+    ysize = int(np.rint(scale*ysize))  
     xrayImage = xrayImage.resize((xsize,ysize),Image.BILINEAR)
     if smooth: xrayImage = xrayImage.filter(ImageFilter.SMOOTH)
     
@@ -137,8 +139,16 @@ def writeImageFile(xrayImageFilename,BMDprojected,imageSize,imageFormat='bmp',sm
 
     return
 
-# ~~~~~~~~~~   
+# ~~~~~~~~~~
 
+def parseRegionSetName(regionSetName):
+    """ Get region and setName from regionSetName """ 
+    if '.' in regionSetName: region,setName = regionSetName.split('.')
+    else:                    region,setName = 'Assembly',regionSetName   
+    return region,setName
+
+# ~~~~~~~~~~   
+'''
 def getPartData(odb,partName,setName,TM,numNodesPerElem):
 
     """Get part data based on original (undeformed) coordinates"""
@@ -151,7 +161,7 @@ def getPartData(odb,partName,setName,TM,numNodesPerElem):
     # Create a list of element connectivities (list of nodes connected to each element)    
     setNodeLabs     = {}
     numElems        = len(pElems)
-    elemConnect     = numpy.zeros(numElems,dtype=[('label','|i4'),('connectivity','|i4',(numNodesPerElem,))])
+    elemConnect     = np.zeros(numElems,dtype=[('label','|i4'),('connectivity','|i4',(numNodesPerElem,))])
     for e in xrange(numElems):
         elem = pElems[e]
         conn = elem.connectivity
@@ -159,11 +169,11 @@ def getPartData(odb,partName,setName,TM,numNodesPerElem):
         for n in conn:        
             setNodeLabs[n] = 1
     
-    # Create a dictionary of node labels and node coordinates for the entire part instance
+    # Create a dictionary of node labels and node coordinates
     numNodes    = len(pNodes)
     numSetNodes = len(setNodeLabs) 
     nodeCount   = 0
-    setNodes    = numpy.zeros(numSetNodes,dtype=[('label','|i4'),('coordinates','|f4',(3,))])
+    setNodes    = np.zeros(numSetNodes,dtype=[('label','|i4'),('coordinates','|f4',(3,))])
     for n in xrange(numNodes):
         node  = pNodes[n]
         label = node.label
@@ -177,8 +187,8 @@ def getPartData(odb,partName,setName,TM,numNodesPerElem):
             setNodes['coordinates'][i] = transformPoint(TM,setNodes['coordinates'][i])
         
     # Get bounding box
-    low  = numpy.min(setNodes['coordinates'],axis=0)
-    upp  = numpy.max(setNodes['coordinates'],axis=0) 
+    low  = np.min(setNodes['coordinates'],axis=0)
+    upp  = np.max(setNodes['coordinates'],axis=0) 
     bbox = (low,upp)
 
     # Convert setNodes to a dictionary for fast indexing by node label
@@ -231,6 +241,106 @@ def checkElementTypes(eTypes,partName):
         return None
            
     return partElemType,supportedElements[partElemType] 
+'''
+# ~~~~~~~~~~
+    
+def getElements(odb,regionSetName):
+    
+    """Get element type and number of nodes per element"""
+        
+    # Get region set and elements
+    region,setName = parseRegionSetName(regionSetName)
+    if setName=='ALL': setRegion = odb.rootAssembly.instances[region]
+    else:              setRegion = odb.rootAssembly.allSets[regionSetName]
+    elements = setRegion.elements
+    
+    # Get part information: (1) instance names, (2) element types and (3) number of each element type 
+    partInfo={}
+    for e in elements: 
+        if not partInfo.has_key(e.instanceName): partInfo[e.instanceName]={}
+        if not partInfo[e.instanceName].has_key(e.type): partInfo[e.instanceName][e.type]=0
+        partInfo[e.instanceName][e.type]+=1  
+        
+    # Put all element types from all part instances in a list
+    eTypes = []
+    for k1 in partInfo.keys():
+        for k2 in partInfo[k1].keys(): eTypes.append(k2)
+    eTypes = dict.fromkeys(eTypes,1).keys()
+        
+    # Check that elements are supported
+    usTypes=[]
+    for eType in eTypes:
+        if not any([True for seType in et.seTypes.keys() if seType==eType]):
+            usTypes.append(str(eType))
+    if len(usTypes)>0:
+        if len(usTypes)==1: strvars = ('',usTypes[0],regionSetName,'is')
+        else:               strvars = ('s',', '.join(usTypes),regionSetName,'are') 
+        print '\nElement type%s %s in region %s %s not supported' % strvars
+        return None
+    
+    return partInfo, elements, setRegion
+       
+# ~~~~~~~~~~      
+
+def getPartData(odb,regionSetName,TM):
+
+    """Get region data based on original (undeformed) coordinates"""
+
+    # Get elements and part info
+    result = getElements(odb,regionSetName)
+    if result==None: return None
+    else:
+        regionInfo, regionSet, elements = result
+        numElems = len(elements)
+        ec = dict([(ename,eclass()) for ename,eclass in et.seTypes.items()])
+               
+    # Create empty dictionary,array to store element data 
+    elemData = copy.deepcopy(regionInfo)
+    for instName in elemData.keys():
+        for k,v in elemData[instName].items():
+            elemData[instName][k] = np.zeros(v,dtype=[('label','|i4'),('econn','|i4',(ec[k].numNodes,))])
+    # Dictionary to store node labels of all nodes connected to elements  
+    setNodeLabs = dict.fromkeys(regionInfo,{})
+    # Create a list of element connectivities (list of nodes connected to each element)    
+    for e in xrange(numElems):
+        elem = elements[e]
+        conn = elem.connectivity
+        inst = elem.instanceName
+        elemData[inst][elem.type]=(elem.label, conn)
+        for n in conn:        
+            setNodeLabs[inst][n] = 1
+    
+    numSetNodes = np.sum([len(setNodeLabs[k]) for k in setNodeLabs.keys()])
+    setNodes    = np.zeros(numSetNodes,dtype=[('instName','|a80'),('label','|i4'),('coord','|f4',(3,))])    
+    nodeCount   = 0
+    for instName in setNodeLabs.keys():
+        inst  = odb.rootAssembly.instances[instName]
+        nodes = inst.nodes
+        numNodes = len(nodes)
+        for n in xrange(numNodes):
+            node  = nodes[n]
+            label = node.label
+            if label in setNodeLabs[instName]:
+                setNodes[nodeCount] = (instName,label,node.coordinates)
+                nodeCount+=1
+    
+    # Transform the coordinates from the global csys to the local csys
+    if TM is not None:
+        for i in xrange(numSetNodes):
+            setNodes['coord'][i] = transformPoint(TM,setNodes['coord'][i])
+        
+    # Get bounding box
+    low  = np.min(setNodes['coord'],axis=0)
+    upp  = np.max(setNodes['coord'],axis=0) 
+    bbox = (low,upp)
+
+    # Convert setNodes to a dictionary for fast indexing by node label
+    setNodeList = dict.fromkeys(regionInfo,{})    
+    for instName in setNodeList.keys():
+        indx = np.where(setNodes['instName']==instName)
+        setNodeList[instName] = dict(zip(setNodes[indx]['label'],setNodes[indx]['coord']))      
+    
+    return regionSet,elemData,setNodeList,bbox
     
 # ~~~~~~~~~~      
 
@@ -258,6 +368,7 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
     # element type. Currently the only supported elements are C3D4 and C3D10 (and
     # variants of these such as C3D10M etc). The bone and implant parts may use
     # different element types from each other. 
+    '''
     bElementInfo = getElementInfo(odb,bPartName,bSetName)
     if bElementInfo==None: return
     bElemType,bNumNodesPerElem = bElementInfo
@@ -267,17 +378,17 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
         iElementInfo = getElementInfo(odb,iPartName,iSetName) 
         if iElementInfo==None: return
         iElemType,iNumNodesPerElem = iElementInfo
-    
+    '''
     # Get transformation matrix to convert from global to local coordinate system
     TM = getTMfromCsys(odb,csysName)
     print 'X-ray views will be relative to %s' % csysName
 
     # Get part data and create a bounding box. The bounding box should include the implant if specified
-    bRegion,bNodeList,bElemConnect,bBBox = getPartData(odb,bPartName,bSetName,TM,bNumNodesPerElem)
+    bRegion,bElemData,bNodeList,bBBox = getPartData(odb,bRegionSetName,TM)
     if showImplant:    
-        iRegion,iNodeList,iElemConnect,iBBox = getPartData(odb,iPartName,iSetName,TM,iNumNodesPerElem)
-        bbLow = numpy.min((bBBox[0],iBBox[0]),axis=0)
-        bbUpp = numpy.max((bBBox[1],iBBox[1]),axis=0)
+        iRegion,iElemData,iNodeList,iBBox = getPartData(odb,iRegionSetName,TM)
+        bbLow = np.min((bBBox[0],iBBox[0]),axis=0)
+        bbUpp = np.max((bBBox[1],iBBox[1]),axis=0)
     else:
         bbLow,bbUpp = bBBox 
        
@@ -290,19 +401,19 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
     lx,ly,lz = bbSides
 
     # Generate Xray grid
-    NX = int(numpy.ceil(lx/dx+1))
-    x  = numpy.linspace(x0,xN,NX)
-    NY = int(numpy.ceil(ly/dy+1))
-    y  = numpy.linspace(y0,yN,NY)
-    NZ = int(numpy.ceil(lz/dz+1))
-    z  = numpy.linspace(z0,zN,NZ)  
+    NX = int(np.ceil(lx/dx+1))
+    x  = np.linspace(x0,xN,NX)
+    NY = int(np.ceil(ly/dy+1))
+    y  = np.linspace(y0,yN,NY)
+    NZ = int(np.ceil(lz/dz+1))
+    z  = np.linspace(z0,zN,NZ)  
     
     # Create element map for the implant, map tp 3D space array and then project onto 3 planes 
     if showImplant: 
         # Get element map       
         iElementMap  = createElementMap(iNodeList,iElemConnect['label'],iElemConnect['connectivity'],iNumNodesPerElem,x,y,z)        
         # Mask 3D array
-        iMask = numpy.zeros((NX,NY,NZ),dtype=numpy.float64)   
+        iMask = np.zeros((NX,NY,NZ),dtype=np.float64)   
         for gpi in xrange(iElementMap.size):
             gridPoint = iElementMap[gpi]
             if gridPoint['cte'] > 0:
@@ -316,9 +427,9 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
         iprojXY = iProjectedXY.copy()
         iprojYZ = iProjectedYZ.copy()
         iprojXZ = iProjectedXZ.copy()        
-        prXY    = [numpy.min(iprojXY),numpy.max(iprojXY)]
-        prYZ    = [numpy.min(iprojYZ),numpy.max(iprojYZ)]
-        prXZ    = [numpy.min(iprojXZ),numpy.max(iprojXZ)]        
+        prXY    = [np.min(iprojXY),np.max(iprojXY)]
+        prYZ    = [np.min(iprojYZ),np.max(iprojYZ)]
+        prXZ    = [np.min(iprojXZ),np.max(iprojXZ)]        
         iprojXY[:,:] = (iprojXY[:,:]-prXY[0])/(prXY[1]-prXY[0])*255.
         iprojYZ[:,:] = (iprojYZ[:,:]-prYZ[0])/(prYZ[1]-prYZ[0])*255. 
         iprojXZ[:,:] = (iprojXZ[:,:]-prXZ[0])/(prXZ[1]-prXZ[0])*255.         
@@ -332,10 +443,17 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
     # Interpolate HU values from tet mesh onto grid using quadratic tet shape function
     # (a) Get HU values from frame
     numSteps  = len(stepList)
-    xraysXY   = numpy.zeros((numSteps,NX,NY),dtype=numpy.float64)
-    xraysYZ   = numpy.zeros((numSteps,NY,NZ),dtype=numpy.float64)
-    xraysXZ   = numpy.zeros((numSteps,NX,NZ),dtype=numpy.float64)
-    mappedBMD = numpy.zeros((NX,NY,NZ),dtype=numpy.float64)
+    xraysXY   = np.zeros((numSteps,NX,NY),dtype=np.float64)
+    xraysYZ   = np.zeros((numSteps,NY,NZ),dtype=np.float64)
+    xraysXZ   = np.zeros((numSteps,NX,NZ),dtype=np.float64)
+    mappedBMD = np.zeros((NX,NY,NZ),dtype=np.float64)
+        
+    # Initialise BMDvalues         
+    BMDvalues = dict.fromkeys(elemData.keys(),{})
+    for instName,instData in elemData.items():
+        for etype,eData in instData.items():
+            for i in xrange(eData.size): 
+                BMDvalues[instName][eData[i]['label']] = et.seTypes[etype]()
     
     for s in xrange(numSteps):
         # Step details
@@ -343,35 +461,37 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
         stepName = "Step-%i" % (stepId)
         frame    = odb.steps[stepName].frames[-1]
         # Get BMD data for bRegion in current frame
-        BMDfov    = frame.fieldOutputs[BMDfoname].getSubset(region=bRegion, position=ELEMENT_NODAL).values
-        BMDvalues = {}
+        BMDfov = frame.fieldOutputs[BMDfoname].getSubset(region=bRegion, position=ELEMENT_NODAL).values
+        cel = 0
         for i in xrange(len(BMDfov)):
             val = BMDfov[i]            
-            elementLabel = val.elementLabel            
-            if elementLabel not in BMDvalues:
-                BMDvalues[elementLabel] = numpy.zeros(bNumNodesPerElem)
-                count=0
-            else:
-                count+=1
-            BMDvalues[elementLabel][count] = val.data        
+            instanceName = val.instance.name
+            elementLabel = val.elementLabel
+            if elementLabel!=cel: 
+                cel=elementLabel
+                indx=0
+            else: 
+                indx+=1
+            BMDvalues[instanceName][elementLabel].setNodalValueByIndex(indx,val.data)
+
         # Perform the interpolation from elementMap to 3D space array
         for gpi in xrange(bElementMap.size):
             gridPoint = bElementMap[gpi]
-            cte = gridPoint['cte']
+            instName  = gridPoint['inst'] 
+            cte       = gridPoint['cte']
             if cte > 0:
-                nv  = BMDvalues[cte] 
-                ipc = numpy.array([gridPoint['g'],gridPoint['h'],gridPoint['r']])
+                ipc = [gridPoint['g'],gridPoint['h'],gridPoint['r']]
                 i,j,k = convert1Dto3Dindex(gpi,NX,NY,NZ)
-                mappedBMD[i,j,k] = tetInterpFunc(nv,ipc)
+                mappedBMD[i,j,k] = BMDvalues[instName][cte].interp(ipc)
         # Project onto orthogonal planes    
         xraysXY[s] = projectXrayPlane(mappedBMD,'xy')
         xraysYZ[s] = projectXrayPlane(mappedBMD,'yz')
         xraysXZ[s] = projectXrayPlane(mappedBMD,'xz')
         
     # Get min/max pixel values. Use zero for lower limit (corresponding to background)
-    prXY = [0.,numpy.max(xraysXY)]
-    prYZ = [0.,numpy.max(xraysYZ)]
-    prXZ = [0.,numpy.max(xraysXZ)]
+    prXY = [0.,np.max(xraysXY)]
+    prYZ = [0.,np.max(xraysYZ)]
+    prXZ = [0.,np.max(xraysXZ)]
     # Allow user to change scale factors if desired
     if manualImageScaling:
         fields = (('X-Y','%.6f'%prXY[1]),('Y-Z','%.6f'%prYZ[1]),('X-Z','%.6f'%prXZ[1]))
@@ -389,12 +509,12 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
     xraysXY[:,:,:] = (xraysXY[:,:,:]-prXY[0])/(prXY[1]-prXY[0])*255.      
     xraysYZ[:,:,:] = (xraysYZ[:,:,:]-prYZ[0])/(prYZ[1]-prYZ[0])*255.           
     xraysXZ[:,:,:] = (xraysXZ[:,:,:]-prXZ[0])/(prXZ[1]-prXZ[0])*255.                
-    xraysXY[numpy.where(xraysXY<0.)]   = 0.
-    xraysYZ[numpy.where(xraysYZ<0.)]   = 0.
-    xraysXZ[numpy.where(xraysXZ<0.)]   = 0.
-    xraysXY[numpy.where(xraysXY>255.)] = 255.
-    xraysYZ[numpy.where(xraysYZ>255.)] = 255.
-    xraysXZ[numpy.where(xraysXZ>255.)] = 255.
+    xraysXY[np.where(xraysXY<0.)]   = 0.
+    xraysYZ[np.where(xraysYZ<0.)]   = 0.
+    xraysXZ[np.where(xraysXZ<0.)]   = 0.
+    xraysXY[np.where(xraysXY>255.)] = 255.
+    xraysYZ[np.where(xraysYZ>255.)] = 255.
+    xraysXZ[np.where(xraysXZ>255.)] = 255.
     
     # Create images
     for s in xrange(numSteps):
