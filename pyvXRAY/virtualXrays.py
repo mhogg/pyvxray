@@ -377,22 +377,6 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
     iDensity /= 1000.    
     odb       = session.odbs[odbName]
 
-    # Get element information for each part. An error will be raised if 
-    # unsupported elements are detected or a part is made up of more than one 
-    # element type. Currently the only supported elements are C3D4 and C3D10 (and
-    # variants of these such as C3D10M etc). The bone and implant parts may use
-    # different element types from each other. 
-    '''
-    bElementInfo = getElementInfo(odb,bPartName,bSetName)
-    if bElementInfo==None: return
-    bElemType,bNumNodesPerElem = bElementInfo
-    if bElemType=='C3D4' : tetInterpFunc = LinearTetInterpFunc
-    if bElemType=='C3D10': tetInterpFunc = QuadTetInterpFunc
-    if showImplant: 
-        iElementInfo = getElementInfo(odb,iPartName,iSetName) 
-        if iElementInfo==None: return
-        iElemType,iNumNodesPerElem = iElementInfo
-    '''
     # Get transformation matrix to convert from global to local coordinate system
     TM = getTMfromCsys(odb,csysName)
     print 'X-ray views will be relative to %s' % csysName
@@ -424,8 +408,17 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
     
     # Create element map for the implant, map to 3D space array and then project onto 3 planes 
     if showImplant: 
-        # Get element map       
-        iElementMap  = createElementMap(iNodeList,iElemData['label'],iElemData['econn'],iNumNodesPerElem,x,y,z)        
+        # Get a map for each instance and element type. Then combine maps together. There should be
+        # only 1 intersection per gridpoint/element, so just replace data where cte>0
+        # NOTE: Could also pass this into the cython module
+        # Note: Need to modify cython module to take variable etype and then switch to the correct interpolation function
+        iElementMap=np.zeros((NX*NY*NZ),dtype=(('label',int),('cte',int),('g',float),('h',float),('r',float)))
+        for instName in iElemData.keys():
+            for etype in iElemData[instName]:
+                edata = iElemData[instName][etype]
+                emap  = createElementMap(iNodeList,edata['label'],edata['econn'],etype,x,y,z) 
+            indx = np.where(emap['cte']>0)
+            iElementMap[indx] = emap[indx]
         # Mask 3D array
         iMask = np.zeros((NX,NY,NZ),dtype=np.float64)   
         for gpi in xrange(iElementMap.size):
@@ -452,7 +445,13 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
         writeImageFile('implant_XZ',iprojXZ,preferredXraySize,imageFormat,smooth)
 
     # Create the element map for the bone
-    bElementMap = createElementMap(bNodeList,bElemData['label'],bElemData['econn'],bNumNodesPerElem,x,y,z)
+    bElementMap=np.zeros((NX*NY*NZ),dtype=(('label',int),('cte',int),('g',float),('h',float),('r',float)))
+    for instName in bElemData.keys():
+        for etype in bElemData[instName]:
+            edata = bElemData[instName][etype]
+            emap  = createElementMap(iNodeList,edata['label'],edata['econn'],etype,x,y,z) 
+        indx = np.where(emap['cte']>0)
+        bElementMap[indx] = emap[indx]    
     
     # Interpolate HU values from tet mesh onto grid using quadratic tet shape function
     # (a) Get HU values from frame
