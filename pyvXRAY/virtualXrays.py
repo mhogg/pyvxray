@@ -8,13 +8,13 @@ import os
 from abaqus import session, getInputs
 from abaqusConstants import ELEMENT_NODAL
 from cythonMods import createElementMap, LinearTetInterpFunc, QuadTetInterpFunc
-import elementTypes as et
+import elemTypes as et
 import copy
 from odbAccess import OdbMeshElementType
 
 # Use try to prevent error importing missing modules when pyvXRAY plug-in is launched
 try:
-    import np
+    import numpy as np
     from PIL import Image, ImageFilter
 except: pass
 
@@ -252,13 +252,13 @@ def getElements(odb,regionSetName):
     # Get region set and elements
     region,setName = parseRegionSetName(regionSetName)
     if region=='Assembly':
-        setRegion =  odb.rootAssembly.allSets[regionSetName]
+        setRegion =  odb.rootAssembly.elementSets[regionSetName]
         if type(setRegion.elements[0])==OdbMeshElementType:       
             elements = setRegion.elements        
         else:
             elements=[]
-            for elems in range(len(setRegion.elements)):
-                for e in elems:
+            for meshElemArray in setRegion.elements:
+                for e in meshElemArray:
                     elements.append(e)
     else:
         if setName=='ALL':
@@ -313,16 +313,22 @@ def getPartData(odb,regionSetName,TM):
     for instName in elemData.keys():
         for k,v in elemData[instName].items():
             elemData[instName][k] = np.zeros(v,dtype=[('label','|i4'),('econn','|i4',(ec[k].numNodes,))])
-    # Dictionary to store node labels of all nodes connected to elements  
+    eCount      = dict([(k1,dict([k2,0] for k2 in regionInfo[k1].keys())) for k1 in regionInfo.keys()])     
     setNodeLabs = dict.fromkeys(regionInfo,{})
     # Create a list of element connectivities (list of nodes connected to each element)    
     for e in xrange(numElems):
-        elem = elements[e]
-        conn = elem.connectivity
-        inst = elem.instanceName
-        elemData[inst][elem.type]=(elem.label, conn)
-        for n in conn:        
-            setNodeLabs[inst][n] = 1
+        
+        elem  = elements[e]
+        eConn = elem.connectivity
+        eInst = elem.instanceName
+        eType = elem.type
+        
+        eIndex = eCount[eInst][eType]
+        elemData[eInst][eType][eIndex] = (elem.label,eConn)
+        eCount[eInst][eType] +=1  
+        
+        for n in eConn:        
+            setNodeLabs[eInst][n] = 1
     
     numSetNodes = np.sum([len(setNodeLabs[k]) for k in setNodeLabs.keys()])
     setNodes    = np.zeros(numSetNodes,dtype=[('instName','|a80'),('label','|i4'),('coord','|f4',(3,))])    
@@ -334,8 +340,8 @@ def getPartData(odb,regionSetName,TM):
         for n in xrange(numNodes):
             node  = nodes[n]
             label = node.label
-            if label in setNodeLabs[instName]:
-                setNodes[nodeCount] = (instName,label,node.coordinates)
+            if n in setNodeLabs[instName]:
+                setNodes[nodeCount] = (instName,n,node.coordinates)
                 nodeCount+=1
     
     # Transform the coordinates from the global csys to the local csys
@@ -412,7 +418,7 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
         # only 1 intersection per gridpoint/element, so just replace data where cte>0
         # NOTE: Could also pass this into the cython module
         # Note: Need to modify cython module to take variable etype and then switch to the correct interpolation function
-        iElementMap=np.zeros((NX*NY*NZ),dtype=(('label',int),('cte',int),('g',float),('h',float),('r',float)))
+        iElementMap=np.zeros((NX*NY*NZ),dtype=[('label',int),('cte',int),('g',float),('h',float),('r',float)])
         for instName in iElemData.keys():
             for etype in iElemData[instName]:
                 edata = iElemData[instName][etype]
@@ -445,11 +451,14 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
         writeImageFile('implant_XZ',iprojXZ,preferredXraySize,imageFormat,smooth)
 
     # Create the element map for the bone
-    bElementMap=np.zeros((NX*NY*NZ),dtype=(('label',int),('cte',int),('g',float),('h',float),('r',float)))
+    bElementMap=np.zeros((NX*NY*NZ),dtype=[('label',int),('cte',int),('g',float),('h',float),('r',float)])
     for instName in bElemData.keys():
         for etype in bElemData[instName]:
             edata = bElemData[instName][etype]
-            emap  = createElementMap(iNodeList,edata['label'],edata['econn'],etype,x,y,z) 
+            #et.bElemData = bElemData            
+            #et.edata = edata
+            #et.bNodeList = bNodeList
+            emap = createElementMap(bNodeList[instName],edata['label'],edata['econn'],etype,x,y,z) 
         indx = np.where(emap['cte']>0)
         bElementMap[indx] = emap[indx]    
     
@@ -461,7 +470,8 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
     xraysXZ   = np.zeros((numSteps,NX,NZ),dtype=np.float64)
     mappedBMD = np.zeros((NX,NY,NZ),dtype=np.float64)
         
-    # Initialise BMDvalues         
+    # Initialise BMDvalues 
+    print 'Creating empty elements'        
     BMDvalues = dict.fromkeys(bElemData.keys(),{})
     for instName,instData in bElemData.items():
         for etype,eData in instData.items():
@@ -474,6 +484,7 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
         stepName = "Step-%i" % (stepId)
         frame    = odb.steps[stepName].frames[-1]
         # Get BMD data for bRegion in current frame
+        print 'Getting BMDvalues'
         BMDfov = frame.fieldOutputs[BMDfoname].getSubset(region=bRegion, position=ELEMENT_NODAL).values
         cel = 0
         for i in xrange(len(BMDfov)):
@@ -488,6 +499,7 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
             BMDvalues[instanceName][elementLabel].setNodalValueByIndex(indx,val.data)
 
         # Perform the interpolation from elementMap to 3D space array
+        print 'Mapping BMD values'
         for gpi in xrange(bElementMap.size):
             gridPoint = bElementMap[gpi]
             instName  = gridPoint['inst'] 

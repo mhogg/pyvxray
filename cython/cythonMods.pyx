@@ -133,11 +133,18 @@ cdef double vectDot(double[::1] v1, double v2[], int v2size):
  
        
 def createElementMap(dict nodeList, np.ndarray[int32,ndim=1] nConnect_labels, 
-                     np.ndarray[int32,ndim=2] nConnect_connectivity, int numNodesPerElem,                    
+                     np.ndarray[int32,ndim=2] nConnect_connectivity, elemType,                    
                      double[:] x, double[:] y, double[:] z):
                                         
     """Creates a map between a list of points and a list of solid tetrahedral (C3D4 or C3D10) elements"""
 
+    if 'C3D4'  in elemType: 
+        testPointInElement = TestPointInLinearTetElem
+        numNodesPerElem    = 4
+    if 'C3D10' in elemType: 
+        testPointInElement = TestPointInQuadTetElem
+        numNodesPerElem    = 10
+        
     cdef:
         int i,j,k,e,nlabel,NX,NY,NZ,iLow,jLow,kLow,iUpp,jUpp,kUpp,numElems,elemLabel,numGridPoints
         double xLow,yLow,zLow,xUpp,yUpp,zUpp
@@ -154,10 +161,6 @@ def createElementMap(dict nodeList, np.ndarray[int32,ndim=1] nConnect_labels,
     for i in range(numGridPoints):    
         elementMap[i].label = i+1
     
-    # Set point in element test function for each element type
-    if numNodesPerElem == 4:  testPointInElement = TestPointInLinearTetElem
-    if numNodesPerElem == 10: testPointInElement = TestPointInQuadTetElem
-
     numElems = nConnect_labels.shape[0]    
     for e in range(numElems): 
         
@@ -194,7 +197,7 @@ def createElementMap(dict nodeList, np.ndarray[int32,ndim=1] nConnect_labels,
     
     return elementMap
 
-          
+        
 cdef int TestPointInLinearTetElem(double[::1] X2, double[::1] G, double[:,::1] nv, 
                                   double[:,::1] dNdG, double[:,::1] JM):
 

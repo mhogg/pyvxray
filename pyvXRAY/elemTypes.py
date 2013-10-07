@@ -47,13 +47,11 @@ class elementC3D4H(elementC3D4):
 class elementC3D10():
 
     def __init__(self):
-        self.name       = 'C3D10'
-        self.desc       = 'Quadratic tetrahedral element'
-        self.numNodes   = 10
-        self.initN()
-        
-    def initN(self):
-        self.N = np.zeros(self.numNodes)        
+        self.name     = 'C3D10'
+        self.desc     = 'Quadratic tetrahedral element'
+        self.numNodes = 10
+        self.N  = np.zeros(self.numNodes)
+        self.nv = np.zeros(self.numNodes)   
                               
     def evalN(self,ipc):
         g,h,r = ipc
@@ -68,10 +66,14 @@ class elementC3D10():
         self.N[8] =  4.0*g*r
         self.N[9] =  4.0*h*r
         
-    def interp(self,ipc,nv):
+    def interp(self,ipc,nv=None):
         self.evalN(ipc)
-        return np.dot(self.N,nv)
-    
+        if nv==None: return np.dot(self.N,self.nv)
+        else:        return np.dot(self.N,nv)
+        
+    def setNodalValueByIndex(self,indx,val):
+        self.nv[indx]=val
+        
 # ~~~~~~~~~~                             
 
 class elementC3D10M(elementC3D10):
@@ -112,11 +114,11 @@ class elementC3D10I(elementC3D10):
 
 # Supported element types
 seTypes = {}
-seTypes[C3D4]    = elementC3D4
-seTypes[C3D4H]   = elementC3D4H
-seTypes[C3D10]   = elementC3D10
-seTypes[C3D10H]  = elementC3D10H
-seTypes[C3D10I]  = elementC3D10I
-seTypes[C3D10M]  = elementC3D10M
-seTypes[C3D10MH] = elementC3D10MH
+seTypes['C3D4']    = elementC3D4
+seTypes['C3D4H']   = elementC3D4H
+seTypes['C3D10']   = elementC3D10
+seTypes['C3D10H']  = elementC3D10H
+seTypes['C3D10I']  = elementC3D10I
+seTypes['C3D10M']  = elementC3D10M
+seTypes['C3D10MH'] = elementC3D10MH
 
