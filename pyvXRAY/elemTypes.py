@@ -30,7 +30,7 @@ class elementC3D4():
         if nv==None: return np.dot(self.N,self.nv)
         else:        return np.dot(self.N,nv)
         
-    def setNodalValueByUndex(self,indx,val):
+    def setNodalValueByIndex(self,indx,val):
         self.nv[indx]=val
     
 # ~~~~~~~~~~                              

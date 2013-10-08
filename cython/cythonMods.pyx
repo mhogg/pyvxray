@@ -133,18 +133,11 @@ cdef double vectDot(double[::1] v1, double v2[], int v2size):
  
        
 def createElementMap(dict nodeList, np.ndarray[int32,ndim=1] nConnect_labels, 
-                     np.ndarray[int32,ndim=2] nConnect_connectivity, elemType,                    
+                     np.ndarray[int32,ndim=2] nConnect_connectivity, int numNodesPerElem,                    
                      double[:] x, double[:] y, double[:] z):
                                         
     """Creates a map between a list of points and a list of solid tetrahedral (C3D4 or C3D10) elements"""
-
-    if 'C3D4'  in elemType: 
-        testPointInElement = TestPointInLinearTetElem
-        numNodesPerElem    = 4
-    if 'C3D10' in elemType: 
-        testPointInElement = TestPointInQuadTetElem
-        numNodesPerElem    = 10
-        
+       
     cdef:
         int i,j,k,e,nlabel,NX,NY,NZ,iLow,jLow,kLow,iUpp,jUpp,kUpp,numElems,elemLabel,numGridPoints
         double xLow,yLow,zLow,xUpp,yUpp,zUpp
@@ -156,6 +149,10 @@ def createElementMap(dict nodeList, np.ndarray[int32,ndim=1] nConnect_labels,
     numGridPoints = NX*NY*NZ
     cdef np.ndarray[mappedPoint,ndim=1] elementMap = np.zeros(numGridPoints,dtype=np.dtype([('label',np.int32),('cte',np.int32),
                                                      ('g',np.float64),('h',np.float64),('r',np.float64)]))
+
+    # Select correct function depending on linear or quadratic element
+    if numNodesPerElem == 4:  testPointInElement = TestPointInLinearTetElem
+    if numNodesPerElem == 10: testPointInElement = TestPointInQuadTetElem
     
     # Set default values of elementMap. Label = index+1, and cte=0 if no intersection is found
     for i in range(numGridPoints):    
@@ -178,8 +175,8 @@ def createElementMap(dict nodeList, np.ndarray[int32,ndim=1] nConnect_labels,
         getMaxVals(tetNodeCoords,tetCoordsUpp)
         iLow = getNearest(x,tetCoordsLow[0],0); iUpp = getNearest(x,tetCoordsUpp[0],1) 
         jLow = getNearest(y,tetCoordsLow[1],0); jUpp = getNearest(y,tetCoordsUpp[1],1)
-        kLow = getNearest(z,tetCoordsLow[2],0); kUpp = getNearest(z,tetCoordsUpp[2],1) 
-        
+        kLow = getNearest(z,tetCoordsLow[2],0); kUpp = getNearest(z,tetCoordsUpp[2],1)
+                
         # Find intersections between tet and grid points
         for k in range(kLow,kUpp+1):
             for j in range(jLow,jUpp+1):

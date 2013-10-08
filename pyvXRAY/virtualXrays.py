@@ -7,7 +7,7 @@
 import os
 from abaqus import session, getInputs
 from abaqusConstants import ELEMENT_NODAL
-from cythonMods import createElementMap, LinearTetInterpFunc, QuadTetInterpFunc
+from cythonMods import createElementMap # LinearTetInterpFunc, QuadTetInterpFunc
 import elemTypes as et
 import copy
 from odbAccess import OdbMeshElementType
@@ -149,101 +149,6 @@ def parseRegionSetName(regionSetName):
     return region,setName
 
 # ~~~~~~~~~~   
-'''
-def getPartData(odb,partName,setName,TM,numNodesPerElem):
-
-    """Get part data based on original (undeformed) coordinates"""
-    
-    p = odb.rootAssembly.instances[partName] 
-    pNodes    = p.nodes
-    setRegion = p.elementSets[setName]
-    pElems    = setRegion.elements
-    
-    # Create a list of element connectivities (list of nodes connected to each element)    
-    setNodeLabs     = {}
-    numElems        = len(pElems)
-    elemConnect     = np.zeros(numElems,dtype=[('label','|i4'),('connectivity','|i4',(numNodesPerElem,))])
-    for e in xrange(numElems):
-        elem = pElems[e]
-        conn = elem.connectivity
-        elemConnect[e] = (elem.label, conn)
-        for n in conn:        
-            setNodeLabs[n] = 1
-    
-    # Create a dictionary of node labels and node coordinates
-    numNodes    = len(pNodes)
-    numSetNodes = len(setNodeLabs) 
-    nodeCount   = 0
-    setNodes    = np.zeros(numSetNodes,dtype=[('label','|i4'),('coordinates','|f4',(3,))])
-    for n in xrange(numNodes):
-        node  = pNodes[n]
-        label = node.label
-        if label in setNodeLabs:
-            setNodes[nodeCount] = (label, node.coordinates) 
-            nodeCount += 1
-        
-    # Transform the coordinates from the global csys to the local csys
-    if TM is not None:
-        for i in xrange(numSetNodes):
-            setNodes['coordinates'][i] = transformPoint(TM,setNodes['coordinates'][i])
-        
-    # Get bounding box
-    low  = np.min(setNodes['coordinates'],axis=0)
-    upp  = np.max(setNodes['coordinates'],axis=0) 
-    bbox = (low,upp)
-
-    # Convert setNodes to a dictionary for fast indexing by node label
-    setNodeList = dict(zip(setNodes['label'],setNodes['coordinates']))       
-    
-    return setRegion,setNodeList,elemConnect,bbox
-
-# ~~~~~~~~~~ 
-
-def getElementInfo(odb,partName,setName):
-    """Get element type and number of nodes per element"""
-    
-    elements = odb.rootAssembly.instances[partName].elementSets[setName].elements 
-    eTypes   = {}
-    for e in elements:
-        eTypes[e.type]=1
-    eTypes=[str(eType) for eType in eTypes.keys()]  
-    
-    return checkElementTypes(eTypes,partName)
-    
-# ~~~~~~~~~~ 
-
-def checkElementTypes(eTypes,partName):
-    """Check element type. Only supported elements and a single element type per part are allowed"""
-    
-    # Perform checks of element types    
-    supportedElements={}
-    supportedElements['C3D4']  =  4
-    supportedElements['C3D10'] = 10     
-    
-    # Check 1: Check for unsupported element types   
-    usTypes=[]
-    for eType in eTypes:
-        if not any([True for seType in supportedElements.keys() if seType in eType]):
-            usTypes.append(eType)
-    if len(usTypes)>0:
-        print 'Element types %s in part %s are not supported' % (', '.join(usTypes),partName)   
-        return None
-
-    # Check 2: Check that the part consists of single element type only
-    sTypes={}
-    for eType in eTypes:
-        for sType in [seType for seType in supportedElements.keys() if seType in eType]:
-            sTypes[sType]=1
-    sTypes = sTypes.keys()
-    if len(sTypes)==1:
-        partElemType = sTypes[0] 
-    else:
-        print 'Multiple element types in part %s not supported' % partName 
-        return None
-           
-    return partElemType,supportedElements[partElemType] 
-'''
-# ~~~~~~~~~~
     
 def getElements(odb,regionSetName):
     
@@ -340,8 +245,8 @@ def getPartData(odb,regionSetName,TM):
         for n in xrange(numNodes):
             node  = nodes[n]
             label = node.label
-            if n in setNodeLabs[instName]:
-                setNodes[nodeCount] = (instName,n,node.coordinates)
+            if label in setNodeLabs[instName]:
+                setNodes[nodeCount] = (instName,label,node.coordinates)
                 nodeCount+=1
     
     # Transform the coordinates from the global csys to the local csys
@@ -382,10 +287,11 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
     dx,dy,dz  = (resGrid,)*3
     iDensity /= 1000.    
     odb       = session.odbs[odbName]
+    ec        = dict([(ename,eclass()) for ename,eclass in et.seTypes.items()])
 
     # Get transformation matrix to convert from global to local coordinate system
     TM = getTMfromCsys(odb,csysName)
-    print 'X-ray views will be relative to %s' % csysName
+    print '\nX-ray views will be relative to %s' % csysName
 
     # Get part data and create a bounding box. The bounding box should include the implant if specified
     bRegion,bElemData,bNodeList,bBBox = getPartData(odb,bRegionSetName,TM)
@@ -412,6 +318,11 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
     NZ = int(np.ceil(lz/dz+1))
     z  = np.linspace(z0,zN,NZ)  
     
+    et.x = x
+    et.y = y
+    et.z = z
+    print bbLow, bbUpp
+    
     # Create element map for the implant, map to 3D space array and then project onto 3 planes 
     if showImplant: 
         # Get a map for each instance and element type. Then combine maps together. There should be
@@ -420,9 +331,9 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
         # Note: Need to modify cython module to take variable etype and then switch to the correct interpolation function
         iElementMap=np.zeros((NX*NY*NZ),dtype=[('label',int),('cte',int),('g',float),('h',float),('r',float)])
         for instName in iElemData.keys():
-            for etype in iElemData[instName]:
+            for etype in iElemData[instName].keys():
                 edata = iElemData[instName][etype]
-                emap  = createElementMap(iNodeList,edata['label'],edata['econn'],etype,x,y,z) 
+                emap  = createElementMap(iNodeList,edata['label'],edata['econn'],ec[etype].numNodes,x,y,z) 
             indx = np.where(emap['cte']>0)
             iElementMap[indx] = emap[indx]
         # Mask 3D array
@@ -451,16 +362,17 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
         writeImageFile('implant_XZ',iprojXZ,preferredXraySize,imageFormat,smooth)
 
     # Create the element map for the bone
-    bElementMap=np.zeros((NX*NY*NZ),dtype=[('label',int),('cte',int),('g',float),('h',float),('r',float)])
+    bElementMap=np.zeros((NX*NY*NZ),dtype=[('inst','|a80'),('cte',int),('g',float),('h',float),('r',float)])
     for instName in bElemData.keys():
-        for etype in bElemData[instName]:
+        for etype in bElemData[instName].keys():
             edata = bElemData[instName][etype]
-            #et.bElemData = bElemData            
-            #et.edata = edata
-            #et.bNodeList = bNodeList
-            emap = createElementMap(bNodeList[instName],edata['label'],edata['econn'],etype,x,y,z) 
-        indx = np.where(emap['cte']>0)
-        bElementMap[indx] = emap[indx]    
+            emap  = createElementMap(bNodeList[instName],edata['label'],edata['econn'],ec[etype].numNodes,x,y,z) 
+            indx  = np.where(emap['cte']>0)
+            bElementMap['inst'][indx] = instName
+            bElementMap['cte'][indx]  = emap['cte'][indx]
+            bElementMap['g'][indx]    = emap['g'][indx]
+            bElementMap['h'][indx]    = emap['h'][indx]
+            bElementMap['r'][indx]    = emap['r'][indx]
     
     # Interpolate HU values from tet mesh onto grid using quadratic tet shape function
     # (a) Get HU values from frame
@@ -471,7 +383,6 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
     mappedBMD = np.zeros((NX,NY,NZ),dtype=np.float64)
         
     # Initialise BMDvalues 
-    print 'Creating empty elements'        
     BMDvalues = dict.fromkeys(bElemData.keys(),{})
     for instName,instData in bElemData.items():
         for etype,eData in instData.items():
@@ -484,7 +395,7 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
         stepName = "Step-%i" % (stepId)
         frame    = odb.steps[stepName].frames[-1]
         # Get BMD data for bRegion in current frame
-        print 'Getting BMDvalues'
+        print 'Getting BMDvalues in %s' % stepName
         BMDfov = frame.fieldOutputs[BMDfoname].getSubset(region=bRegion, position=ELEMENT_NODAL).values
         cel = 0
         for i in xrange(len(BMDfov)):
@@ -499,7 +410,7 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
             BMDvalues[instanceName][elementLabel].setNodalValueByIndex(indx,val.data)
 
         # Perform the interpolation from elementMap to 3D space array
-        print 'Mapping BMD values'
+        print 'Mapping BMD values in %s' % stepName
         for gpi in xrange(bElementMap.size):
             gridPoint = bElementMap[gpi]
             instName  = gridPoint['inst'] 
@@ -512,7 +423,7 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
         xraysXY[s] = projectXrayPlane(mappedBMD,'xy')
         xraysYZ[s] = projectXrayPlane(mappedBMD,'yz')
         xraysXZ[s] = projectXrayPlane(mappedBMD,'xz')
-        
+                
     # Get min/max pixel values. Use zero for lower limit (corresponding to background)
     prXY = [0.,np.max(xraysXY)]
     prYZ = [0.,np.max(xraysYZ)]
@@ -542,6 +453,7 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
     xraysXZ[np.where(xraysXZ>255.)] = 255.
     
     # Create images
+    print 'Writing virtual x-ray image files'
     for s in xrange(numSteps):
         stepId = stepList[s]
         writeImageFile(('%s_XY_%i' % (imageNameBase,stepId)),xraysXY[s,:,:],preferredXraySize,imageFormat,smooth)
@@ -549,5 +461,5 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
         writeImageFile(('%s_XZ_%i' % (imageNameBase,stepId)),xraysXZ[s,:,:],preferredXraySize,imageFormat,smooth)
         
     # User message
-    print 'Virtual x-rays have been created in %s\n' % os.getcwd()
+    print '\nVirtual x-rays have been created in %s\n' % os.getcwd()
     
