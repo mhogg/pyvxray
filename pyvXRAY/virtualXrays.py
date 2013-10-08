@@ -212,14 +212,14 @@ def getPartData(odb,regionSetName,TM):
         regionInfo, regionSet, elements = result
         numElems = len(elements)
         ec = dict([(ename,eclass()) for ename,eclass in et.seTypes.items()])
-               
+
     # Create empty dictionary,array to store element data 
     elemData = copy.deepcopy(regionInfo)
     for instName in elemData.keys():
         for k,v in elemData[instName].items():
             elemData[instName][k] = np.zeros(v,dtype=[('label','|i4'),('econn','|i4',(ec[k].numNodes,))])
     eCount      = dict([(k1,dict([k2,0] for k2 in regionInfo[k1].keys())) for k1 in regionInfo.keys()])     
-    setNodeLabs = dict.fromkeys(regionInfo,{})
+    setNodeLabs = dict([(k,{}) for k in regionInfo.keys()])    
     # Create a list of element connectivities (list of nodes connected to each element)    
     for e in xrange(numElems):
         
@@ -251,6 +251,7 @@ def getPartData(odb,regionSetName,TM):
     
     # Transform the coordinates from the global csys to the local csys
     if TM is not None:
+        print 'TM is not None'
         for i in xrange(numSetNodes):
             setNodes['coord'][i] = transformPoint(TM,setNodes['coord'][i])
         
@@ -260,7 +261,7 @@ def getPartData(odb,regionSetName,TM):
     bbox = (low,upp)
 
     # Convert setNodes to a dictionary for fast indexing by node label
-    setNodeList = dict.fromkeys(regionInfo,{})    
+    setNodeList = dict([(k,{}) for k in regionInfo.keys()])    
     for instName in setNodeList.keys():
         indx = np.where(setNodes['instName']==instName)
         setNodeList[instName] = dict(zip(setNodes[indx]['label'],setNodes[indx]['coord']))      
@@ -317,18 +318,10 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
     y  = np.linspace(y0,yN,NY)
     NZ = int(np.ceil(lz/dz+1))
     z  = np.linspace(z0,zN,NZ)  
-    
-    et.x = x
-    et.y = y
-    et.z = z
-    print bbLow, bbUpp
-    
+        
     # Create element map for the implant, map to 3D space array and then project onto 3 planes 
     if showImplant: 
-        # Get a map for each instance and element type. Then combine maps together. There should be
-        # only 1 intersection per gridpoint/element, so just replace data where cte>0
-        # NOTE: Could also pass this into the cython module
-        # Note: Need to modify cython module to take variable etype and then switch to the correct interpolation function
+        # Get a map for each instance and element type. Then combine maps together
         iElementMap=np.zeros((NX*NY*NZ),dtype=[('label',int),('cte',int),('g',float),('h',float),('r',float)])
         for instName in iElemData.keys():
             for etype in iElemData[instName].keys():
@@ -383,7 +376,7 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
     mappedBMD = np.zeros((NX,NY,NZ),dtype=np.float64)
         
     # Initialise BMDvalues 
-    BMDvalues = dict.fromkeys(bElemData.keys(),{})
+    BMDvalues = dict([(k,{}) for k in bElemData.keys()])         
     for instName,instData in bElemData.items():
         for etype,eData in instData.items():
             for i in xrange(eData.size): 
