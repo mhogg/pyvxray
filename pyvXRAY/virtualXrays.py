@@ -7,7 +7,7 @@
 import os
 from abaqus import session, getInputs
 from abaqusConstants import ELEMENT_NODAL
-from cythonMods import createElementMap # LinearTetInterpFunc, QuadTetInterpFunc
+from cythonMods import createElementMap
 import elemTypes as et
 import copy
 from odbAccess import OdbMeshElementType

@@ -33,7 +33,7 @@ cdef double fmin(double a, double b):
 
 # Packed structure for use in numpy record array 
 cdef packed struct mappedPoint:
-    int32 label, cte
+    int32 cte
     float64 g,h,r  
        
 
@@ -136,28 +136,26 @@ def createElementMap(dict nodeList, np.ndarray[int32,ndim=1] nConnect_labels,
                      np.ndarray[int32,ndim=2] nConnect_connectivity, int numNodesPerElem,                    
                      double[:] x, double[:] y, double[:] z):
                                         
-    """Creates a map between a list of points and a list of solid tetrahedral (C3D4 or C3D10) elements"""
+    """Creates a map between a list of points and a list of solid tetrahedral elements"""
        
     cdef:
         int i,j,k,e,nlabel,NX,NY,NZ,iLow,jLow,kLow,iUpp,jUpp,kUpp,numElems,elemLabel,numGridPoints
         double xLow,yLow,zLow,xUpp,yUpp,zUpp
         double[::1]   gridPointCoords=np.empty(3), ipc=np.zeros(3)  
-        double[:,::1] tetNodeCoords=np.empty((3,numNodesPerElem)), JM=np.empty((3,3)),dNdG=np.empty((numNodesPerElem,3))
+        double[:,::1] tetNodeCoords=np.empty((3,numNodesPerElem)), JM=np.empty((3,3))
+        double[:,::1] dNdG=np.empty((numNodesPerElem,3))
         double tetCoordsLow[3], tetCoordsUpp[3]
 
     NX=x.shape[0]; NY=y.shape[0]; NZ=z.shape[0]
     numGridPoints = NX*NY*NZ
-    cdef np.ndarray[mappedPoint,ndim=1] elementMap = np.zeros(numGridPoints,dtype=np.dtype([('label',np.int32),('cte',np.int32),
-                                                     ('g',np.float64),('h',np.float64),('r',np.float64)]))
+    dtype=np.dtype([('cte',np.int32),('g',np.float64),('h',np.float64),('r',np.float64)])
+    cdef np.ndarray[mappedPoint,ndim=1] elementMap = np.zeros(numGridPoints,dtype=dtype)
 
     # Select correct function depending on linear or quadratic element
     if numNodesPerElem == 4:  testPointInElement = TestPointInLinearTetElem
     if numNodesPerElem == 10: testPointInElement = TestPointInQuadTetElem
     
-    # Set default values of elementMap. Label = index+1, and cte=0 if no intersection is found
-    for i in range(numGridPoints):    
-        elementMap[i].label = i+1
-    
+    # Create the element map    
     numElems = nConnect_labels.shape[0]    
     for e in range(numElems): 
         
