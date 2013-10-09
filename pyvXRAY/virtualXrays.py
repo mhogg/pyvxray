@@ -458,5 +458,6 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
         writeImageFile(('%s_XZ_%i' % (imageNameBase,stepId)),xraysXZ[s,:,:],preferredXraySize,imageFormat,smooth)
         
     # User message
-    print '\nVirtual x-rays have been created in %s\n' % os.getcwd()
+    print 'Virtual x-rays have been created in %s' % os.getcwd()
+    print '\nFinished\n'
     
