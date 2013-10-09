@@ -27,13 +27,9 @@ For building cython modules from source (e.g. if not using releases with pre-bui
 
 ### Model setup requirements
 
-* The model must contain only linear or quadrilateral tetrahedral elements (ABAQUS element types C3D4 and C3D10, respectively)
+* The model must contain only linear or quadrilateral tetrahedral elements (ABAQUS element types C3D4, C3D4H, C3D10, C3D10H, C3D10I, C3D10M, and C3D10MH are all supported).
 * The model must have a scalar fieldoutput variable representing bone density. This is typically a state variable such as SDV1. 
   This scalar variable must be available in the last frame of each step to be analysed, as only the last frame is used.
-
-**LIMITATIONS:**
-
-* Virtual x-rays can only be created for element sets within part instances. Assembly element sets (which may contain elements from more than a single part) are currently not supported
 
 ## Installation
 
@@ -112,12 +108,12 @@ Given these limitations, there are two obvious choices for installating PIL / Pi
 ## Usage
 
 * Open ABAQUS/CAE
-* Open the ABAQUS odb file within the current viewport
+* Open an odb file
 * To launch the pyvXRAY GUI, go to the menubar at the top of the screen and select:
 
         Plug-ins --> pyvXRAY --> Create virtual x-rays
 
-* Complete the required inputs in the GUI to suit the current model. More information is given below about the inputs. Error messages will be issued if any information is entered incorrectly.
+* Complete the required inputs in the GUI to suit the current model. More information is given below about the inputs
 * Click OK to run pyvXRAY
 * Look at the message area at the bottom of the screen for messages. On completion 'Finished' will be shown.
 
@@ -127,87 +123,97 @@ A basic description of each of the inputs required by pyvXRAY is listed here.
 
 <table>
 <th align="left">GUI tab</th><th>Input name </th><th>Input description</th>
+
 <tr>
 <td width="100">Select regions</td>
-<td width="150">Bone: Part instance name</td>
-<td>The name of the part instance containing the bone</td>
+<td>Result file: Odb</td>
+<td>The ABAQUS result file</td>
 </tr>
+
 <tr>
 <td></td>
-<td>Bone: Set name</td>
-<td>The element set in the part instance representing bone. If the entire part instance is bone, then an element set containing all the elements in the part instance is needed.</td></tr>
+<td width="150">Bone region: Bone set</td>
+<td>The name of the element set representing the bone</td>
+</tr>
+
 <tr>
 <td></td>
-<td>Bone: Density variable</td>
+<td>Bone region: Density variable</td>
 <td>A scalar fieldoutput variable representing bone density.<br>This is most often a state variable i.e. SDV1</td>
 </tr>
+
 <tr>
 <td></td>
-<td>Show implant on x-rays</td>
+<td>Implant region: Show implant on x-rays</td>
 <td>Option to include implant on the virtual x-rays </td>
 </tr>
+
 <tr>
 <td></td>
-<td>Implant: Part instance name</td>
-<td>The name of the part instance containing the implant</td>
+<td>Implant region: Implant set</td>
+<td>The name of the element set representing the implant</td>
 </tr>
+
 <tr>
 <td></td>
-<td>Implant: Set name</td>
-<td>The element set in the part instance representing the implant. If the entire part instance is an implant, then an element set containing all the elements in the part instance 
-is needed.</td>
-</tr>
-<tr>
-<td></td>
-<td>Implant: Density (kg/m^3)</td>
+<td>Implant region: Density (kg/m^3)</td>
 <td>The density of the implant material in kg/m^3 i.e. 4500 for Titanium Alloy</td>
 </tr>
+
 <tr>
 <td>Inputs</td>
-<td>Step list</td>
+<td>Required inputs: Step list</td>
 <td>A list of steps to be analysed i.e. 1, 2, 3. A virtual x-ray is created for the last frame of each step in this list.</td>
 </tr>
+
 <tr>
 <td></td>
-<td>Coordinate system</td>
+<td>Required inputs: Coordinate system</td>
 <td>The name of the coordinate system used to create the projections. By default this is the global coordinate system. However, the views can be changed by creating a new coordinate 
 system in ABAQUS and using it instead.</td>
 </tr>
+
 <tr>
 <td></td>
-<td>Mapping resolution (mm)</td>
+<td>Required inputs: Mapping resolution (mm)</td>
 <td>pyvXRAY works by mapping the results of the bone density variable onto a regular grid. The mapping resolution is the cell spacing of this regular grid. Decreasing this number 
-increases the accuracy of the mapping, but also increases the calculation time. As a first pass, a value of around 2mm is recommended to ensure that all the inputs are correct.</td>
+increases the accuracy of the mapping, but also increases the calculation time. As a first pass, a value of around 2mm is recommended to ensure that output is as expected.</td>
 </tr>
+
 <tr>
 <td>X-ray settings</td>
-<td>Base name of xray file(s)</td>
+<td>Settings: Base name of xray file(s)</td>
 <td>This is the base or root name of the virtual x-ray image files. That is, image files are labelled <code>basename_projection_stepnumber</code> i.e. <code>basename_XY_1</code> for 
 the X-Y projection from Step 1.</td>
 </tr>
+
 <tr>
 <td></td>
-<td>Approx size of x-ray images</td>
+<td>Settings: Approx size of x-ray images</td>
 <td>Resizing of images is performed to make the number of pixels along the largest image dimension equal to this value.</td>
 </tr>
+
 <tr>
 <td></td>
-<td>Image file format</td>
+<td>Settings: Image file format</td>
 <td>Output format of images. Options are bmp, jpeg and png.</td>
 </tr>
+
 <tr>
 <td></td>
-<td>Smooth images</td>
+<td>Settings: Smooth images</td>
 <td>Turn on image smoothing. <code>PIL.ImageFilter.SMOOTH</code> is used to perform the smoothing.</td>
 </tr>
+
 <tr>
 <td></td>
-<td>Manual scaling of images</td>
+<td>Settings: Manual scaling of images</td>
 <td>pyvXRAY scales the mapped bone density values when creating the virtual x-ray images. The image files are 24-bit (or 8-bit per channel), so the gray scale range is essentially 0-255. 
 The scale factor used ensures that this range is fully utilised and that none of the images in the series are over-exposed. Activating this option reports the scale factors used and gives 
 the user the ability to change these values. This may be desirable when comparing virtual x-rays from different models; an equal comparison is possible only if the same scale factors are 
 used for both. </td>
 </tr>
+
 </table>
 
 ## Outputs
