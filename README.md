@@ -6,7 +6,7 @@
 
 Copyright 2013, Michael Hogg (michael.christopher.hogg@gmail.com)
 
-MIT license - See pyvxray/LICENSE.txt for details on usage and redistribution
+MIT license - See LICENSE.txt for details on usage and redistribution
 
 ## Requirements
 
