@@ -33,24 +33,24 @@ cdef double fmin(double a, double b):
 
 # Packed structure for use in numpy record array 
 cdef packed struct mappedPoint:
-    int32 label, cte
+    int32 cte
     float64 g,h,r  
        
 
-cpdef double LinearTetInterpFunc(double[::1] nv, double[::1] ipc):
-    """Shape function for first order tetrahedral (C3D4) element"""    
-    cdef double N[4], U
-    CLinearTetShapeFuncMatrix(ipc,N)
-    U = vectDot(nv,N,4)
-    return U
+#cpdef double LinearTetInterpFunc(double[::1] nv, double[::1] ipc):
+#    """Shape function for first order tetrahedral (C3D4) element"""    
+#    cdef double N[4], U
+#    CLinearTetShapeFuncMatrix(ipc,N)
+#    U = vectDot(nv,N,4)
+#    return U
 
         
-cpdef double QuadTetInterpFunc(double[::1] nv, double[::1] ipc):
-    """Shape function for second order tetrahedral (C3D10) element"""    
-    cdef double N[10], U
-    CQuadTetShapeFuncMatrix(ipc,N)
-    U = vectDot(nv,N,10)
-    return U    
+#cpdef double QuadTetInterpFunc(double[::1] nv, double[::1] ipc):
+#    """Shape function for second order tetrahedral (C3D10) element"""    
+#    cdef double N[10], U
+#    CQuadTetShapeFuncMatrix(ipc,N)
+#    U = vectDot(nv,N,10)
+#    return U    
     
     
 cdef int convert3Dto1Dindex(int i, int j, int k, int NX, int NY, int NZ):
@@ -136,28 +136,26 @@ def createElementMap(dict nodeList, np.ndarray[int32,ndim=1] nConnect_labels,
                      np.ndarray[int32,ndim=2] nConnect_connectivity, int numNodesPerElem,                    
                      double[:] x, double[:] y, double[:] z):
                                         
-    """Creates a map between a list of points and a list of solid tetrahedral (C3D4 or C3D10) elements"""
-
+    """Creates a map between a list of points and a list of solid tetrahedral elements"""
+       
     cdef:
         int i,j,k,e,nlabel,NX,NY,NZ,iLow,jLow,kLow,iUpp,jUpp,kUpp,numElems,elemLabel,numGridPoints
         double xLow,yLow,zLow,xUpp,yUpp,zUpp
         double[::1]   gridPointCoords=np.empty(3), ipc=np.zeros(3)  
-        double[:,::1] tetNodeCoords=np.empty((3,numNodesPerElem)), JM=np.empty((3,3)),dNdG=np.empty((numNodesPerElem,3))
+        double[:,::1] tetNodeCoords=np.empty((3,numNodesPerElem)), JM=np.empty((3,3))
+        double[:,::1] dNdG=np.empty((numNodesPerElem,3))
         double tetCoordsLow[3], tetCoordsUpp[3]
 
     NX=x.shape[0]; NY=y.shape[0]; NZ=z.shape[0]
     numGridPoints = NX*NY*NZ
-    cdef np.ndarray[mappedPoint,ndim=1] elementMap = np.zeros(numGridPoints,dtype=np.dtype([('label',np.int32),('cte',np.int32),
-                                                     ('g',np.float64),('h',np.float64),('r',np.float64)]))
-    
-    # Set default values of elementMap. Label = index+1, and cte=0 if no intersection is found
-    for i in range(numGridPoints):    
-        elementMap[i].label = i+1
-    
-    # Set point in element test function for each element type
+    dtype=np.dtype([('cte',np.int32),('g',np.float64),('h',np.float64),('r',np.float64)])
+    cdef np.ndarray[mappedPoint,ndim=1] elementMap = np.zeros(numGridPoints,dtype=dtype)
+
+    # Select correct function depending on linear or quadratic element
     if numNodesPerElem == 4:  testPointInElement = TestPointInLinearTetElem
     if numNodesPerElem == 10: testPointInElement = TestPointInQuadTetElem
-
+    
+    # Create the element map    
     numElems = nConnect_labels.shape[0]    
     for e in range(numElems): 
         
@@ -175,8 +173,8 @@ def createElementMap(dict nodeList, np.ndarray[int32,ndim=1] nConnect_labels,
         getMaxVals(tetNodeCoords,tetCoordsUpp)
         iLow = getNearest(x,tetCoordsLow[0],0); iUpp = getNearest(x,tetCoordsUpp[0],1) 
         jLow = getNearest(y,tetCoordsLow[1],0); jUpp = getNearest(y,tetCoordsUpp[1],1)
-        kLow = getNearest(z,tetCoordsLow[2],0); kUpp = getNearest(z,tetCoordsUpp[2],1) 
-        
+        kLow = getNearest(z,tetCoordsLow[2],0); kUpp = getNearest(z,tetCoordsUpp[2],1)
+                
         # Find intersections between tet and grid points
         for k in range(kLow,kUpp+1):
             for j in range(jLow,jUpp+1):
@@ -194,7 +192,7 @@ def createElementMap(dict nodeList, np.ndarray[int32,ndim=1] nConnect_labels,
     
     return elementMap
 
-          
+        
 cdef int TestPointInLinearTetElem(double[::1] X2, double[::1] G, double[:,::1] nv, 
                                   double[:,::1] dNdG, double[:,::1] JM):
 
@@ -205,27 +203,23 @@ cdef int TestPointInLinearTetElem(double[::1] X2, double[::1] G, double[:,::1] n
         double tol,lowLim,uppLim,dX[3],N[4],X1[3]
         int result
     
-    tol=1.0e-6; lowLim=0.0-tol; uppLim=1.0+tol 
-       
-    G[0]=0.0; G[1]=0.0; G[2]=0.0
-    
-    # Run this twice to ensure that error is reduced and an intersection can be found
-    for j in range(2):
-
-        CLinearTetShapeFuncMatrix(G,N)
-        # nv(3x4) x N(4,1) = X1(3x1)
-        result = MatVecMult(nv,N,4,X1,3)  
-        for i in range(3):
-            dX[i] = X2[i]-X1[i]  
+    tol=1.0e-4; lowLim=0.0-tol; uppLim=1.0+tol 
+    for i in range(3): G[i]=0.0
+          
+    CLinearTetShapeFuncMatrix(G,N)
+    # nv(3x4) x N(4,1) = X1(3x1)
+    result = MatVecMult(nv,N,4,X1,3)  
+    for i in range(3):
+        dX[i] = X2[i]-X1[i]  
                   
-        CLinearTetShapeFuncDerivMatrix(G,dNdG)
-        # nv(3x4) x dNdG(4,3) = JM(3x3)    
-        result = MatMult(nv,dNdG,JM)
+    CLinearTetShapeFuncDerivMatrix(G,dNdG)
+    # nv(3x4) x dNdG(4,3) = JM(3x3)    
+    result = MatMult(nv,dNdG,JM)
 
-        # Solve system of linear equations, Dx = J Dg
-        result = SolveLinearEquations(JM,dX)
-        for i in range(3): 
-            G[i] += dX[i] 
+    # Solve system of linear equations, Dx = J Dg
+    result = SolveLinearEquations(JM,dX)
+    for i in range(3): 
+        G[i] += dX[i] 
         
     # Test if point lies within tet element                    
     if((G[0]+G[1]+G[2])<=uppLim          and \
