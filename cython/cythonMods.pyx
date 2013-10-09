@@ -37,20 +37,20 @@ cdef packed struct mappedPoint:
     float64 g,h,r  
        
 
-cpdef double LinearTetInterpFunc(double[::1] nv, double[::1] ipc):
-    """Shape function for first order tetrahedral (C3D4) element"""    
-    cdef double N[4], U
-    CLinearTetShapeFuncMatrix(ipc,N)
-    U = vectDot(nv,N,4)
-    return U
+#cpdef double LinearTetInterpFunc(double[::1] nv, double[::1] ipc):
+#    """Shape function for first order tetrahedral (C3D4) element"""    
+#    cdef double N[4], U
+#    CLinearTetShapeFuncMatrix(ipc,N)
+#    U = vectDot(nv,N,4)
+#    return U
 
         
-cpdef double QuadTetInterpFunc(double[::1] nv, double[::1] ipc):
-    """Shape function for second order tetrahedral (C3D10) element"""    
-    cdef double N[10], U
-    CQuadTetShapeFuncMatrix(ipc,N)
-    U = vectDot(nv,N,10)
-    return U    
+#cpdef double QuadTetInterpFunc(double[::1] nv, double[::1] ipc):
+#    """Shape function for second order tetrahedral (C3D10) element"""    
+#    cdef double N[10], U
+#    CQuadTetShapeFuncMatrix(ipc,N)
+#    U = vectDot(nv,N,10)
+#    return U    
     
     
 cdef int convert3Dto1Dindex(int i, int j, int k, int NX, int NY, int NZ):
@@ -205,27 +205,23 @@ cdef int TestPointInLinearTetElem(double[::1] X2, double[::1] G, double[:,::1] n
         double tol,lowLim,uppLim,dX[3],N[4],X1[3]
         int result
     
-    tol=1.0e-6; lowLim=0.0-tol; uppLim=1.0+tol 
-       
-    G[0]=0.0; G[1]=0.0; G[2]=0.0
-    
-    # Run this twice to ensure that error is reduced and an intersection can be found
-    for j in range(2):
-
-        CLinearTetShapeFuncMatrix(G,N)
-        # nv(3x4) x N(4,1) = X1(3x1)
-        result = MatVecMult(nv,N,4,X1,3)  
-        for i in range(3):
-            dX[i] = X2[i]-X1[i]  
+    tol=1.0e-4; lowLim=0.0-tol; uppLim=1.0+tol 
+    for i in range(3): G[i]=0.0
+          
+    CLinearTetShapeFuncMatrix(G,N)
+    # nv(3x4) x N(4,1) = X1(3x1)
+    result = MatVecMult(nv,N,4,X1,3)  
+    for i in range(3):
+        dX[i] = X2[i]-X1[i]  
                   
-        CLinearTetShapeFuncDerivMatrix(G,dNdG)
-        # nv(3x4) x dNdG(4,3) = JM(3x3)    
-        result = MatMult(nv,dNdG,JM)
+    CLinearTetShapeFuncDerivMatrix(G,dNdG)
+    # nv(3x4) x dNdG(4,3) = JM(3x3)    
+    result = MatMult(nv,dNdG,JM)
 
-        # Solve system of linear equations, Dx = J Dg
-        result = SolveLinearEquations(JM,dX)
-        for i in range(3): 
-            G[i] += dX[i] 
+    # Solve system of linear equations, Dx = J Dg
+    result = SolveLinearEquations(JM,dX)
+    for i in range(3): 
+        G[i] += dX[i] 
         
     # Test if point lies within tet element                    
     if((G[0]+G[1]+G[2])<=uppLim          and \

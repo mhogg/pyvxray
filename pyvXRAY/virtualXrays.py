@@ -322,13 +322,17 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
     # Create element map for the implant, map to 3D space array and then project onto 3 planes 
     if showImplant: 
         # Get a map for each instance and element type. Then combine maps together
-        iElementMap=np.zeros((NX*NY*NZ),dtype=[('label',int),('cte',int),('g',float),('h',float),('r',float)])
+        iElementMap=np.zeros((NX*NY*NZ),dtype=[('inst','|a80'),('cte',int),('g',float),('h',float),('r',float)])
         for instName in iElemData.keys():
             for etype in iElemData[instName].keys():
                 edata = iElemData[instName][etype]
-                emap  = createElementMap(iNodeList,edata['label'],edata['econn'],ec[etype].numNodes,x,y,z) 
-            indx = np.where(emap['cte']>0)
-            iElementMap[indx] = emap[indx]
+                emap  = createElementMap(iNodeList[instName],edata['label'],edata['econn'],ec[etype].numNodes,x,y,z) 
+                indx  = np.where(emap['cte']>0)
+                iElementMap['inst'][indx] = instName
+                iElementMap['cte'][indx]  = emap['cte'][indx]
+                iElementMap['g'][indx]    = emap['g'][indx]
+                iElementMap['h'][indx]    = emap['h'][indx]
+                iElementMap['r'][indx]    = emap['r'][indx]
         # Mask 3D array
         iMask = np.zeros((NX,NY,NZ),dtype=np.float64)   
         for gpi in xrange(iElementMap.size):
