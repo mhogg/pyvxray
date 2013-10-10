@@ -2,7 +2,7 @@ The pyvXRAY source distribution was built using the following procedure:
 1. Open command prompt and go to pyvXRAY directory
 2. Create cythonMods.c file: 
    $ cd cython
-   $ cython cythonMods.pyx
+   $ cython -a cythonMods.pyx
 3. Build the source distribution
    $ cd..
    $ python setup.py sdist
@@ -11,19 +11,18 @@ The pyvXRAY binary distribution was then built using the following procedure:
 
    $ abaqus python setup.py bdist 
 
-The binary distribution is made available for 64-bit Windows only. The same 
-command may be used for 32-bit windows. It may also be done using a stand 
-alone Python using the following command:
+The binary distribution is made available for 32-bit and 64-bit Windows only. 
+This may also be done using a stand alone Python using the following command:
 
-   $ python setup.py build_ext --compiler=msvc bdist 
+   $ python setup.py bdist --compiler=msvc 
    
-To do this, the stand alone python installation must use the same Python 
-and numpy versions used in ABAQUS. This is typically Python 2.6 and numpy 1.4.
-The mingw32 compiler option may also be used if using a stand alone python
-installation, but not otherwise.
+To do this, the stand alone Python installation must use the same Python 
+and numpy versions used in ABAQUS. This is typically Python 2.6.x and numpy 1.4.x.
+The mingw32 compiler (--compiler=mingw32) may also be used if using a stand alone
+Python installation, but not otherwise.
 
 NOTES: 
-1. When creating binary distribution using abaqus python, the --compiler 
+1. When creating binary distribution using ABAQUS Python, the --compiler 
    option is not available. It will automatically use msvc if installed and
    give an error otherwise.
 2. setup.cfg was used with the following settings:
@@ -33,4 +32,4 @@ NOTES:
    $ abaqus python setup.py sdist upload
 4. For some reason, PyPi doesn't like my binary distributions. Perhaps because
    it does not use the standard install directory. Therefore, binaries are
-   manually uploaded to https://code.google.com/p/pyvxray/
+   made available at https://github.com/mhogg/pyvxray/releases

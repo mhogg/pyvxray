@@ -39,9 +39,9 @@ pyvXRAY is an ABAQUS plug-in. ABAQUS plug-ins may be installed in several ways. 
 
 * _Releases with pre-built modules_
 
-  + Download the latest pyvXRAY release with pre-built modules. This is only made available for a single platform, which is 64-bit Windows
+  + Download the latest pyvXRAY release with pre-built modules. This is only made available for 32-bit and 64-bit Windows
   + Unpack this to a convenient location
-  + Copy the pyvXRAY sub-folder to the `abaqus_plugins` directory within your ABAQUS installation. The location of this directory depends on your ABAQUS version. Some possible locations are:
+  + Move the `abaqus_plugins\pyvXRAY` folder to the correct location of the `abaqus_plugins` directory within your ABAQUS installation. The location of this directory depends on your ABAQUS version. Some possible locations are:
 
       v6.11-x: `C:\SIMULIA\Abaqus\6.11-x\abaqus_plugins`
 
@@ -228,4 +228,4 @@ regions of interest (ROIs) and determine the change in the average grey scale va
 
 ## Help
  
-For help post a question on the [project support page](https://groups.google.com/forum/#!forum/pyvxray) or create an Issue on Github.
+For help create an Issue or a Pull Request on Github.

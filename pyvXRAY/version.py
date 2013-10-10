@@ -6,4 +6,4 @@
 
 # Version and date
 version     = '0.2.0'
-releasedate = '2013-10-09'
+releasedate = '2013-10-10'

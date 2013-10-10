@@ -1,5 +1,6 @@
 include *.in
 include *.txt
+include *.md
 recursive-include pyvXRAY *.pyd
 recursive-include cython *.pyx
 recursive-include cython *.c

@@ -1,4 +1,21 @@
 
+Version 0.2.0: Release date 2013-10-10
+--------------------------------------
+1. Added support for assembly element sets, part instance element sets and all elements
+   from a part instance. Previously only part instance element sets were supported.
+2. Added support for all linear and quadratic element types. Previously only C3D4 and 
+   C3D10 were supported. Now C3D4, C3D4H, C3D10, C3D10H, C3D10I, C3D10M and C3D10MH are 
+   all supported. 
+3. Re-write of GUI. Added automatic filling of inputs and checking of inputs by the GUI
+   (as opposed to the kernel). This includes auto detection of odbs in session, of element 
+   sets for bone and implant, of bone density variable, of steps and of csyses.
+4. Various bug fixes.
+5. Updated README. Now use markdown (md), rather than txt
+6. Update of setup.py so that LICENSE.txt and README.md are included in bdist (not just sdist)
+7. Cleanup of redundant code
+8. Tested and added support for Pillow
+
+
 Version 0.1.4: Release date 2013-08-30
 --------------------------------------
 1. Added option for manual scaling of images. This is to allow the same scale factors to 

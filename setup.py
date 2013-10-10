@@ -34,8 +34,8 @@ setup(
     author_email = 'michael.christopher.hogg@gmail.com',
     url = "https://github.com/mhogg/pyvxray",
     download_url = "https://github.com/mhogg/pyvxray/releases", 
-    packages = ['pyvXRAY'],
-    package_data = {'pyvXRAY': ['cythonMods.pyd',]},
+    packages = ['','pyvXRAY'],
+    package_data = {'':['LICENSE.txt','README.md'],'pyvXRAY': ['cythonMods.pyd',]},
     classifiers = [
         "Programming Language :: Python",                                  
         "Programming Language :: Cython",         

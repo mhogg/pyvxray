@@ -203,6 +203,7 @@ cdef int TestPointInLinearTetElem(double[::1] X2, double[::1] G, double[:,::1] n
         double tol,lowLim,uppLim,dX[3],N[4],X1[3]
         int result
     
+    # Initialise variables
     tol=1.0e-4; lowLim=0.0-tol; uppLim=1.0+tol 
     for i in range(3): G[i]=0.0
           
