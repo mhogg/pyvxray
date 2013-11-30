@@ -404,6 +404,9 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
                 indx=0
             else: 
                 indx+=1
+            # NOTE: Would this be better done once per element, rather than multiple calls?
+            #       Difficulty would be when to call this function. Perhaps when indx is equal to 
+            #       the number of nodes in the element type...
             BMDvalues[instanceName][elementLabel].setNodalValueByIndex(indx,val.data)
 
         # Perform the interpolation from elementMap to 3D space array
