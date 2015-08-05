@@ -125,7 +125,7 @@ class PyvXRAY_plugin(AFXForm):
         return pyvXRAYDB.PyvXRAYDB(self)
 
     def doCustomChecks(self):
-        """Perform custom checks of inputs"""
+        """Define empty class function doCustomChecks to check user inputs"""
     
         # Check that odb exists
         self.getOdbList()
@@ -203,18 +203,6 @@ class PyvXRAY_plugin(AFXForm):
             showAFXErrorDialog( self.getCurrentDialog(), 'Error: ABAQUS 6.11 and above is required' )
             return False
         
-        # Check for numpy
-        try: import numpy as np
-        except: 
-            showAFXErrorDialog( self.getCurrentDialog(), 'Error: Required module numpy cannot be found' )
-            return False   
-
-        # Check for PIL or Pillow
-        try: from PIL import Image
-        except: 
-            showAFXErrorDialog( self.getCurrentDialog(), 'Error: Required module PIL / Pillow cannot be found' )
-            return False                
-                
         return True
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

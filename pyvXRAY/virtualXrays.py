@@ -11,12 +11,7 @@ from cythonMods import createElementMap
 import elemTypes as et
 import copy
 from odbAccess import OdbMeshElementType
-
-# Use try to prevent error importing missing modules when pyvXRAY plug-in is launched
-try:
-    import numpy as np
-    from PIL import Image, ImageFilter
-except: pass
+import numpy as np
 
 # ~~~~~~~~~~
 
@@ -102,19 +97,17 @@ def getTMfromCsys(odb,csysName):
 
 def projectXrayPlane(spaceArray3D,whichPlane):
     """Project 3D BMD data onto the specified plane"""
-    # Perform the projection by summing along orthogonal axis    
-    if whichPlane=='xy':
-        projected = np.sum(spaceArray3D,axis=2,dtype=spaceArray3D.dtype)
-    elif whichPlane=='yz':
-        projected = np.sum(spaceArray3D,axis=0,dtype=spaceArray3D.dtype)
-    elif whichPlane=='xz':
-        projected = np.sum(spaceArray3D,axis=1,dtype=spaceArray3D.dtype)   
-    return projected
-
+    # Perform the projection by summing along orthogonal axis
+    planeSelect = {'xy':2, 'yz':0, 'xz':1}
+    return np.sum(spaceArray3D,axis=planeSelect[whichPlane],dtype=spaceArray3D.dtype)
+    
 # ~~~~~~~~~~  
 
 def writeImageFile(xrayImageFilename,BMDprojected,imageSize,imageFormat='bmp',smooth=True):
     """Create an image from array and write to file"""
+    
+    # Re-import PIL.Image and PIL.ImageFilter into current function namespace
+    from PIL import Image, ImageFilter
     
     # Convert to 8-bit
     xray = BMDprojected.copy()
@@ -268,7 +261,18 @@ def getPartData(odb,regionSetName,TM):
     
     return regionSet,elemData,setNodeList,bbox
     
-# ~~~~~~~~~~      
+# ~~~~~~~~~~ 
+
+def checkDependencies():
+    """Check pyvxray dependencies are available"""        
+    try:
+        from PIL import Image, ImageFilter
+    except: 
+        print 'Error: Cannot load PIL / Pillow package'
+        return False
+    return True
+    
+# ~~~~~~~~~~ 
 
 def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetName,
                        iDensity,stepList,csysName,resGrid,imageNameBase,preferredXraySize,
@@ -278,6 +282,11 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
         
     # User message
     print '\npyvXRAY: Create virtual x-rays plugin'
+    
+    # Check dependencies
+    if not checkDependencies():
+        print 'Error: Virtual x-rays not created\n'
+        return
     
     # Process inputs    
     resGrid           = float(resGrid)
@@ -354,9 +363,9 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
         iprojXY[:,:] = (iprojXY[:,:]-prXY[0])/(prXY[1]-prXY[0])*255.
         iprojYZ[:,:] = (iprojYZ[:,:]-prYZ[0])/(prYZ[1]-prYZ[0])*255. 
         iprojXZ[:,:] = (iprojXZ[:,:]-prXZ[0])/(prXZ[1]-prXZ[0])*255.         
-        writeImageFile('implant_XY',iprojXY,preferredXraySize,imageFormat,smooth)
-        writeImageFile('implant_YZ',iprojYZ,preferredXraySize,imageFormat,smooth)
-        writeImageFile('implant_XZ',iprojXZ,preferredXraySize,imageFormat,smooth)
+        #writeImageFile('implant_XY',iprojXY,preferredXraySize,imageFormat,smooth)
+        #writeImageFile('implant_YZ',iprojYZ,preferredXraySize,imageFormat,smooth)
+        #writeImageFile('implant_XZ',iprojXZ,preferredXraySize,imageFormat,smooth)
 
     # Create the element map for the bone
     bElementMap=np.zeros((NX*NY*NZ),dtype=[('inst','|a80'),('cte',int),('g',float),('h',float),('r',float)])
@@ -404,9 +413,6 @@ def createVirtualXrays(odbName,bRegionSetName,BMDfoname,showImplant,iRegionSetNa
                 indx=0
             else: 
                 indx+=1
-            # NOTE: Would this be better done once per element, rather than multiple calls?
-            #       Difficulty would be when to call this function. Perhaps when indx is equal to 
-            #       the number of nodes in the element type...
             BMDvalues[instanceName][elementLabel].setNodalValueByIndex(indx,val.data)
 
         # Perform the interpolation from elementMap to 3D space array
