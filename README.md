@@ -40,7 +40,9 @@ pyvXRAY is an ABAQUS plug-in. ABAQUS plug-ins may be installed in several ways. 
 * _Releases with pre-built modules_
 
   + Download the latest pyvXRAY release with pre-built modules. This is available for 32-bit and 64-bit Windows from [releases page](https://github.com/mhogg/pyvxray/releases)
+
   + Unpack this to a convenient location
+  
   + Move the `abaqus_plugins\pyvXRAY` folder to the correct location of the `abaqus_plugins` directory within your ABAQUS installation. The location of this directory depends on your ABAQUS version. Some possible locations are:
 
       v6.11-x: `C:\SIMULIA\Abaqus\6.11-x\abaqus_plugins`
@@ -71,7 +73,7 @@ On Windows it is easiest to install PIL / Pillow using a binary installer, parti
 * ABAQUS Python is typically not registered in the Windows registry, and therefore installation with binary installers will not work by default because the ABAQUS Python
   installation does not appear in the list of available Python installations
 
-* PIL binaries are available only for Python 2.6 on 32-bit Windows at [pythonware.com](http://www.pythonware.com/products/pil/), but not 64-bit Windows. However, Pillow binaries are available for Python 2.6 on both 32-bit and 64-bit Windows are available on [PyPi](https://pypi.python.org/pypi/Pillow).
+* PIL binaries are available only for Python 2.6 on 32-bit Windows at [pythonware.com](http://www.pythonware.com/products/pil/), but not 64-bit Windows. However, Pillow binaries for Python 2.6 on both 32-bit and 64-bit Windows are available on [PyPi](https://pypi.python.org/pypi/Pillow).
 
 Given these limitations, there are two obvious choices for installating PIL / Pillow with ABAQUS Python.
 
