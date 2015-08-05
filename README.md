@@ -117,13 +117,17 @@ Given these limitations, there are two obvious choices for installating PIL / Pi
 ## Usage
 
 * Open ABAQUS/CAE
+
 * Open an odb file
+
 * To launch the pyvXRAY GUI, go to the menubar at the top of the screen and select:
 
         Plug-ins --> pyvXRAY --> Create virtual x-rays
 
 * Complete the required inputs in the GUI to suit the current model. More information is given below about the inputs
+
 * Click OK to run pyvXRAY
+
 * Look at the message area at the bottom of the screen for messages. On completion 'Finished' will be shown.
 
 ## Required inputs
