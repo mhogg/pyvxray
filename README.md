@@ -28,6 +28,7 @@ For building cython modules from source (e.g. if not using releases with pre-bui
 ### Model setup requirements
 
 * The model must contain only linear or quadrilateral tetrahedral elements (ABAQUS element types C3D4, C3D4H, C3D10, C3D10H, C3D10I, C3D10M, and C3D10MH are all supported).
+
 * The model must have a scalar fieldoutput variable representing bone density. This is typically a state variable such as SDV1. 
   This scalar variable must be available in the last frame of each step to be analysed, as only the last frame is used.
 
@@ -54,13 +55,17 @@ pyvXRAY is an ABAQUS plug-in. ABAQUS plug-ins may be installed in several ways. 
 * _Installation from source_
 
   + Download the latest pyvXRAY source, typically called `pyvXRAY-x.x.x.zip` or `pyvXRAY-x.x.x.tar.gz`, where `x.x.x` is the version number
+  
   + Unpack this to a convenient location
+  
   + Open a command prompt and browse to directory `pyvXRAY-x.x.x` (containing file `setup.py`)
+  
   + Run the following command:
 
             abaqus python setup.py build_ext --inplace
 
       which will build the Cython modules. If Cython is available, it will be used. Otherwise the .c files previously generated using Cython will be compiled directly.
+
   + Copy the pyvXRAY sub-folder to the `abaqus_plugins` directory within your ABAQUS installation, following the instructions above for pre-built distribution 
 
 ####2. Installation of pyvXRAY dependencies
@@ -84,7 +89,9 @@ Given these limitations, there are two obvious choices for installating PIL / Pi
   This method is the best solution if you do not feel comfortable modifying the Windows registry (as recommended next).
 
   + Download and install Python 2.6 (i.e. the plain vanilla version from www.python.org/download is recommended)
+
   + Download and run the corresponding binary installer for [PIL](http://www.pythonware.com/products/pil/) or [Pillow](https://pypi.python.org/pypi/Pillow).
+
   + Create an environment variable `PYTHONPATH=C:\Python26\Lib\site-packages` that tells ABAQUS Python where these packages are installed, assuming that `C:\Python26` is the installation directory.
 
 * _Edit the Windows registry and use a binary installer (Windows only)_
@@ -103,7 +110,9 @@ Given these limitations, there are two obvious choices for installating PIL / Pi
      
       v6.13-x: `C:\\SIMULIA\\Abaqus\\6.13-x\\tools\\SMApy\\python2.6`
 
-  Editing the Windows registry can be done using the regedit utility. You can load regedit by typing "regedit" at the command prompt.
+    Editing the Windows registry can be done using the regedit utility. You can load regedit by typing "regedit" at the command prompt.
+  
+  + Install PIL / Pillow using the binary installer. Follow the instructions and make sure to select the ABAQUS Python version if you have multiple Python versions installed. If ABAQUS Python is not in the list of available Python 2.6 versions, then the Windows registry was not edited correctly.
 
 ## Usage
 
