@@ -71,7 +71,7 @@ On Windows it is easiest to install PIL / Pillow using a binary installer, parti
 * ABAQUS Python is typically not registered in the Windows registry, and therefore installation with binary installers will not work by default because the ABAQUS Python
   installation does not appear in the list of available Python installations
 
-* PIL binaries Python 2.6 on 32-bit Windows are available at [pythonware.com](http://www.pythonware.com/products/pil/)) 
+* PIL binaries Python 2.6 on 32-bit Windows are available at [pythonware.com](http://www.pythonware.com/products/pil/)
 
 * Pillow binaries for Python 2.6 on both 32-bit and 64-bit Windows are available on [PyPi](https://pypi.python.org/pypi/Pillow)
 
