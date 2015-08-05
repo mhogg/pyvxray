@@ -71,9 +71,9 @@ On Windows it is easiest to install PIL / Pillow using a binary installer, parti
 * ABAQUS Python is typically not registered in the Windows registry, and therefore installation with binary installers will not work by default because the ABAQUS Python
   installation does not appear in the list of available Python installations
 
-* Although PIL binaries are readily available for 32-bit Windows (at [pythonware.com](http://www.pythonware.com/products/pil/)), PIL binaries for 64-bit Windows are hard to find. However,
-  more recent unofficial Pillow binaries for Python 2.6 on both 32-bit and 64-bit Windows are available at http://www.lfd.uci.edu/~gohlke/pythonlibs/. This currently makes Pillow a more
-  attractive option than PIL.
+* PIL binaries are readily available for 32-bit Windows (at [pythonware.com](http://www.pythonware.com/products/pil/)) 
+
+* Pillow binaries for Python 2.6 on both 32-bit and 64-bit Windows are available on [PyPi](https://pypi.python.org/pypi/Pillow)
 
 Given these limitations, there are two obvious choices for installating PIL / Pillow with ABAQUS Python.
 
@@ -81,11 +81,10 @@ Given these limitations, there are two obvious choices for installating PIL / Pi
 
   The SIMULIA support site suggests that a separate Python installation be setup. The dependencies can be installed easily into this separate Python installation, after which they can 
   then be used by ABAQUS Python. This separate Python installation version must match the ABAQUS Python version, which has been 2.6.x for the following few ABAQUS versions. 
-  This method is the best solution if you have a Python 2.6 distribution that comes with PIL (i.e. such as older versions of EPD) or the user does not feel comfortable modifying the 
-  Windows registry (as recommended next).
+  This method is the best solution if you do not feel comfortable modifying the Windows registry (as recommended next).
 
-  + Download and install Python 2.6 (standard python, or EPD distribution etc)
-  + If your Python distribution doesn't come with PIL / Pillow, then download and run the corresponding binary installer. Pillow is in active development and is recommended over PIL.
+  + Download and install Python 2.6 (i.e. the plain vanilla version from www.python.org/download is recommended)
+  + Download and run the corresponding binary installer for PIL / Pillow. Pillow is in active development and is recommended over PIL.
   + Create an environment variable `PYTHONPATH=C:\Python26\Lib\site-packages` that tells ABAQUS Python where these packages are installed, assuming that `C:\Python26` is the installation directory.
 
 * _Edit the Windows registry and use a binary installer (Windows only)_
@@ -93,7 +92,7 @@ Given these limitations, there are two obvious choices for installating PIL / Pi
   By editing the Windows registry the binary installers will be able to detect the ABAQUS Python version and install as usual. Use caution when editing the Windows registry or backup your 
   registry before hand.
 
-  You need to create registry entry `HKEY_LOCAL_MACHINE\Software\Python\Pythoncore\2.6\InstallPath` and make its value that of your ABAQUS Python directory location. Registry key 
+  You need to create registry entry `HKEY_LOCAL_MACHINE\Software\Python\Pythoncore\2.6\InstallPath` and make its (Default) value that of your ABAQUS Python directory location. Registry key 
   `HKEY_CURRENT_USER` also works. 
   This location depends on the ABAQUS version. For the default ABAQUS installation location, possible locations are:
 
