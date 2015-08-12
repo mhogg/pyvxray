@@ -4,6 +4,7 @@ pyvXRAY
 **An ABAQUS plug-in for the creation of virtual x-rays from 3D finite
 element bone/implant models.**
 
+
 .. image:: https://img.shields.io/pypi/v/pyvxray.svg
    :target: https://pypi.python.org/pypi/pyvxray/
    :alt: Latest PyPI version
@@ -11,6 +12,8 @@ element bone/implant models.**
 .. image:: https://img.shields.io/pypi/dm/pyvxray.svg
    :target: https://pypi.python.org/pypi/pyvxray/
    :alt: Number of PyPI downloads
+
+====
 
 Developed together with `bonemapy`_ and `BMDanalyse`_ to provide tools
 for preparation and post-processing of bone/implant computer models.
@@ -72,47 +75,45 @@ the user is referred to the ABAQUS user manuals.
 
 -  *Releases with pre-built modules*
 
--  Download the latest pyvXRAY release with pre-built modules. This is
-   available for 32-bit and 64-bit Windows from `releases
-   page <https://github.com/mhogg/pyvxray/releases>`__
+    -  Download the latest pyvXRAY release with pre-built modules. This is available for 32-bit and 64-bit Windows from `releases page <https://github.com/mhogg/pyvxray/releases>`__
 
--  Unpack this to a convenient location
+    -  Unpack this to a convenient location
 
--  Move the ``abaqus_plugins\pyvXRAY`` folder to the correct location of
-   the ``abaqus_plugins`` directory within your ABAQUS installation. The
-   location of this directory depends on your ABAQUS version. Some
-   possible locations are:
+    -  Move the ``abaqus_plugins\pyvXRAY`` folder to the correct location of
+       the ``abaqus_plugins`` directory within your ABAQUS installation. The
+       location of this directory depends on your ABAQUS version. Some
+       possible locations are:
 
-   v6.11-x: ``C:\SIMULIA\Abaqus\6.11-x\abaqus_plugins``
+       v6.11-x: ``C:\SIMULIA\Abaqus\6.11-x\abaqus_plugins``
 
-   v6.12-x: ``C:\SIMULIA\Abaqus\6.12-x\code\python\lib\abaqus_plugins``
+       v6.12-x: ``C:\SIMULIA\Abaqus\6.12-x\code\python\lib\abaqus_plugins``
 
-   v6.13-x: ``C:\SIMULIA\Abaqus\6.13-x\code\python\lib\abaqus_plugins``
+       v6.13-x: ``C:\SIMULIA\Abaqus\6.13-x\code\python\lib\abaqus_plugins``
 
 -  *Installation from source*
 
--  Download the latest pyvXRAY source, typically called
-   ``pyvXRAY-x.x.x.zip`` or ``pyvXRAY-x.x.x.tar.gz``, where ``x.x.x`` is
-   the version number
+    -  Download the latest pyvXRAY source, typically called
+       ``pyvXRAY-x.x.x.zip`` or ``pyvXRAY-x.x.x.tar.gz``, where ``x.x.x`` is
+       the version number
 
--  Unpack this to a convenient location
+    -  Unpack this to a convenient location
 
--  Open a command prompt and browse to directory ``pyvXRAY-x.x.x``
-   (containing file ``setup.py``)
+    -  Open a command prompt and browse to directory ``pyvXRAY-x.x.x``
+       (containing file ``setup.py``)
 
--  Run the following command:
+    -  Run the following command:
 
-   ::
+       ::
 
-           abaqus python setup.py build_ext --inplace
+               abaqus python setup.py build_ext --inplace
 
-   which will build the Cython modules. If Cython is available, it will
-   be used. Otherwise the .cpp files previously generated using Cython
-   will be compiled directly.
+       which will build the Cython modules. If Cython is available, it will
+       be used. Otherwise the .cpp files previously generated using Cython
+       will be compiled directly.
 
--  Copy the pyvXRAY sub-folder to the ``abaqus_plugins`` directory
-   within your ABAQUS installation, following the instructions above for
-   pre-built distribution
+    -  Copy the pyvXRAY sub-folder to the ``abaqus_plugins`` directory
+       within your ABAQUS installation, following the instructions above for
+       pre-built distribution
 
 2. Installation of pyvXRAY dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -224,363 +225,50 @@ Required inputs
 A basic description of each of the inputs required by pyvXRAY is listed
 here.
 
-.. raw:: html
 
-   <table>
+GUI tab    Input name    Input description
 
-.. raw:: html
+Select regions    Result file: Odb    The ABAQUS result file
 
-   <th align="left">
+Bone region: Bone set    The name of the element set representing the bone
 
-GUI tab
+Bone region: Density variable    A scalar fieldoutput variable representing bone density.This is most often a state variable i.e. SDV1
 
-.. raw:: html
 
-   </th>
 
-.. raw:: html
 
-   <th>
 
-Input name
 
-.. raw:: html
-
-   </th>
-
-.. raw:: html
-
-   <th>
-
-Input description
-
-.. raw:: html
-
-   </th>
-
-.. raw:: html
-
-   <tr>
-
-.. raw:: html
-
-   <td width="100">
-
-Select regions
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
-
-Result file: Odb
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
-
-The ABAQUS result file
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   </tr>
-
-.. raw:: html
-
-   <tr>
-
-.. raw:: html
-
-   <td>
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td width="150">
-
-Bone region: Bone set
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
-
-The name of the element set representing the bone
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   </tr>
-
-.. raw:: html
-
-   <tr>
-
-.. raw:: html
-
-   <td>
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
-
-Bone region: Density variable
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
-
-A scalar fieldoutput variable representing bone density.This is most
-often a state variable i.e. SDV1
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   </tr>
-
-.. raw:: html
-
-   <tr>
-
-.. raw:: html
-
-   <td>
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
 
 Implant region: Show implant on x-rays
 
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
 
 Option to include implant on the virtual x-rays
 
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   </tr>
-
-.. raw:: html
-
-   <tr>
-
-.. raw:: html
-
-   <td>
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
-
 Implant region: Implant set
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
 
 The name of the element set representing the implant
 
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   </tr>
-
-.. raw:: html
-
-   <tr>
-
-.. raw:: html
-
-   <td>
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
-
 Implant region: Density (kg/m^3)
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
 
 The density of the implant material in kg/m^3 i.e. 4500 for Titanium
 Alloy
 
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   </tr>
-
-.. raw:: html
-
-   <tr>
-
-.. raw:: html
-
-   <td>
-
 Inputs
 
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
-
 Required inputs: Step list
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
 
 A list of steps to be analysed i.e. 1, 2, 3. A virtual x-ray is created
 for the last frame of each step in this list.
 
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   </tr>
-
-.. raw:: html
-
-   <tr>
-
-.. raw:: html
-
-   <td>
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
-
 Required inputs: Coordinate system
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
 
 The name of the coordinate system used to create the projections. By
 default this is the global coordinate system. However, the views can be
 changed by creating a new coordinate system in ABAQUS and using it
 instead.
 
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   </tr>
-
-.. raw:: html
-
-   <tr>
-
-.. raw:: html
-
-   <td>
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
-
 Required inputs: Mapping resolution (mm)
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
 
 pyvXRAY works by mapping the results of the bone density variable onto a
 regular grid. The mapping resolution is the cell spacing of this regular
@@ -588,189 +276,29 @@ grid. Decreasing this number increases the accuracy of the mapping, but
 also increases the calculation time. As a first pass, a value of around
 2mm is recommended to ensure that output is as expected.
 
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   </tr>
-
-.. raw:: html
-
-   <tr>
-
-.. raw:: html
-
-   <td>
-
 X-ray settings
 
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
-
 Settings: Base name of xray file(s)
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
 
 This is the base or root name of the virtual x-ray image files. That is,
 image files are labelled basename\_projection\_stepnumber i.e.
 basename\_XY\_1 for the X-Y projection from Step 1.
 
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   </tr>
-
-.. raw:: html
-
-   <tr>
-
-.. raw:: html
-
-   <td>
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
-
 Settings: Approx size of x-ray images
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
 
 Resizing of images is performed to make the number of pixels along the
 largest image dimension equal to this value.
 
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   </tr>
-
-.. raw:: html
-
-   <tr>
-
-.. raw:: html
-
-   <td>
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
-
 Settings: Image file format
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
 
 Output format of images. Options are bmp, jpeg and png.
 
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   </tr>
-
-.. raw:: html
-
-   <tr>
-
-.. raw:: html
-
-   <td>
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
-
 Settings: Smooth images
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
 
 Turn on image smoothing. PIL.ImageFilter.SMOOTH is used to perform the
 smoothing.
 
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   </tr>
-
-.. raw:: html
-
-   <tr>
-
-.. raw:: html
-
-   <td>
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
-
 Settings: Manual scaling of images
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   <td>
 
 pyvXRAY scales the mapped bone density values when creating the virtual
 x-ray images. The image files are 24-bit (or 8-bit per channel), so the
@@ -781,18 +309,6 @@ factors used and gives the user the ability to change these values. This
 may be desirable when comparing virtual x-rays from different models; an
 equal comparison is possible only if the same scale factors are used for
 both.
-
-.. raw:: html
-
-   </td>
-
-.. raw:: html
-
-   </tr>
-
-.. raw:: html
-
-   </table>
 
 Outputs
 -------
