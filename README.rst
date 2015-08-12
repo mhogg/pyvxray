@@ -225,90 +225,74 @@ Required inputs
 A basic description of each of the inputs required by pyvXRAY is listed
 here.
 
-
-GUI tab    Input name    Input description
-
-Select regions    Result file: Odb    The ABAQUS result file
-
-Bone region: Bone set    The name of the element set representing the bone
-
-Bone region: Density variable    A scalar fieldoutput variable representing bone density.This is most often a state variable i.e. SDV1
-
-
-
-
-
-
-
-Implant region: Show implant on x-rays
-
-
-Option to include implant on the virtual x-rays
-
-Implant region: Implant set
-
-The name of the element set representing the implant
-
-Implant region: Density (kg/m^3)
-
-The density of the implant material in kg/m^3 i.e. 4500 for Titanium
-Alloy
-
-Inputs
-
-Required inputs: Step list
-
-A list of steps to be analysed i.e. 1, 2, 3. A virtual x-ray is created
-for the last frame of each step in this list.
-
-Required inputs: Coordinate system
-
-The name of the coordinate system used to create the projections. By
-default this is the global coordinate system. However, the views can be
-changed by creating a new coordinate system in ABAQUS and using it
-instead.
-
-Required inputs: Mapping resolution (mm)
-
-pyvXRAY works by mapping the results of the bone density variable onto a
-regular grid. The mapping resolution is the cell spacing of this regular
-grid. Decreasing this number increases the accuracy of the mapping, but
-also increases the calculation time. As a first pass, a value of around
-2mm is recommended to ensure that output is as expected.
-
-X-ray settings
-
-Settings: Base name of xray file(s)
-
-This is the base or root name of the virtual x-ray image files. That is,
-image files are labelled basename\_projection\_stepnumber i.e.
-basename\_XY\_1 for the X-Y projection from Step 1.
-
-Settings: Approx size of x-ray images
-
-Resizing of images is performed to make the number of pixels along the
-largest image dimension equal to this value.
-
-Settings: Image file format
-
-Output format of images. Options are bmp, jpeg and png.
-
-Settings: Smooth images
-
-Turn on image smoothing. PIL.ImageFilter.SMOOTH is used to perform the
-smoothing.
-
-Settings: Manual scaling of images
-
-pyvXRAY scales the mapped bone density values when creating the virtual
-x-ray images. The image files are 24-bit (or 8-bit per channel), so the
-gray scale range is essentially 0-255. The scale factor used ensures
-that this range is fully utilised and that none of the images in the
-series are over-exposed. Activating this option reports the scale
-factors used and gives the user the ability to change these values. This
-may be desirable when comparing virtual x-rays from different models; an
-equal comparison is possible only if the same scale factors are used for
-both.
+================  ================================  =====================================================
+GUI tab           Input name                        Input description
+================  ================================  =====================================================
+Select regions    Result file: Odb                  The ABAQUS result file
+----------------  --------------------------------  -----------------------------------------------------
+\                 Bone region: Bone set             The name of the element set representing the bone
+----------------  --------------------------------  -----------------------------------------------------
+\                 Bone region: Density variable     A scalar fieldoutput variable representing bone 
+                                                    density.
+                                                    This is most often a state variable i.e. SDV1
+----------------  --------------------------------  -----------------------------------------------------
+\                 Implant region: Show implant      Option to include implant on the virtual x-rays
+                  on x-rays
+----------------  --------------------------------  -----------------------------------------------------
+\                 Implant region: Implant set       The name of the element set representing the implant
+----------------  --------------------------------  -----------------------------------------------------
+\                 Implant region: Density (kg/m^3)  The density of the implant material in kg/m^3 i.e. 
+                                                    4500 for Titanium Alloy
+----------------  --------------------------------  -----------------------------------------------------
+Inputs            Required inputs: Step list        A list of steps to be analysed i.e. 1, 2, 3. A 
+                                                    virtual x-ray is created for the last frame of each
+                                                    step in this list.
+----------------  --------------------------------  -----------------------------------------------------                                                    
+\                 Required inputs: Coordinate       The name of the coordinate system used to create the 
+                  system                            projections. By default this is the global coordinate 
+                                                    system. However, the views can be changed by creating
+                                                    a new coordinate system in ABAQUS and using it
+                                                    instead.
+----------------  --------------------------------  -----------------------------------------------------
+\                 Required inputs: Mapping          pyvXRAY works by mapping the results of the bone 
+                  resolution (mm)                   density variable onto a regular grid. The mapping
+                                                    resolution is the cell spacing of this regular grid. 
+                                                    Decreasing this number increases the accuracy of the 
+                                                    mapping, but also increases the calculation time. 
+                                                    As a first pass, a value of around 2mm is 
+                                                    recommended to ensure that output is as expected.
+                  
+----------------  --------------------------------  -----------------------------------------------------
+X-ray settings    Settings: Base name of xray       This is the base or root name of the virtual x-ray 
+                  file(s)                           image files. That is, image files are labelled 
+                                                    basename\_projection\_stepnumber i.e.
+                                                    basename\_XY\_1 for the X-Y projection from Step 1.
+                  
+----------------  --------------------------------  -----------------------------------------------------
+\                 Settings: Approx size of x-ray    Resizing of images is performed to make the number of
+                  images                            pixels along the largest image dimension equal to 
+                                                    this value.
+                  
+----------------  --------------------------------  -----------------------------------------------------
+\                 Settings: Image file format       Output format of images. Options are bmp, jpeg and 
+                                                    png.
+----------------  --------------------------------  -----------------------------------------------------
+\                 Settings: Smooth images           Turn on image smoothing. PIL.ImageFilter.SMOOTH is 
+                                                    used to perform the smoothing.
+----------------  --------------------------------  -----------------------------------------------------
+\                 Settings: Manual scaling of       pyvXRAY scales the mapped bone density values when 
+                  images                            creating the virtual x-ray images. The image files
+                                                    are 24-bit (or 8-bit per channel), so the gray scale
+                                                    range is essentially 0-255. The scale factor used 
+                                                    ensures that this range is fully utilised and that 
+                                                    none of the images in the series are over-exposed. 
+                                                    Activating this option reports the scale factors 
+                                                    used and gives the user the ability to change these
+                                                    values. This may be desirable when comparing virtual
+                                                    x-rays from different models; an equal comparison 
+                                                    is possible only if the same scale factors are used
+                                                    for both.
+================  ================================  =====================================================
 
 Outputs
 -------
