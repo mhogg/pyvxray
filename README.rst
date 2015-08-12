@@ -294,13 +294,14 @@ X-ray settings    Settings: Base name of xray       This is the base or root nam
                                                     for both.
 ================  ================================  =====================================================
 
-+-----------------+------------------------------------+------------------------------------------------------+
-| GUI tab         | Input name                         | Input description                                    |     
-+=================+====================================+======================================================+
-|                 | Settings: Manual scaling of images | pyvXRAY scales the mapped bone density values when   | 
-|                 | images                             | creating the virtual x-ray images. The image files   |
-|                 |                                    | are 24-bit (or 8-bit per channel), so the gray scale |
-+-----------------+------------------------------------+------------------------------------------------------+
++-----------------+-------------------------------------+------------------------------------------+
+| GUI tab         | Input name                          | Input description                        |     
++=================+=====================================+==========================================+
+|                 | Settings: Manual scaling of images  | pyvXRAY scales the mapped bone density   |
+|                 |                                     | values when creating the virtual x-ray   |
+|                 |                                     | images. The image files are 24-bit (or   |
+|                 |                                     | 8-bit per channel), so the gray scale    |
++-----------------+-------------------------------------+------------------------------------------+
 
 .. list-table:: 
    :widths: 10 1000 10
