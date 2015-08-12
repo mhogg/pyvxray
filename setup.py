@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013 Michael Hogg
+# Copyright (C) 2015 Michael Hogg
 
 # This file is part of pyvXRAY - See LICENSE.txt for information on usage and redistribution
 
@@ -19,17 +19,17 @@ else:
 cmdclass    = {}
 ext_modules = []
 if use_cython:  
-    ext_modules += [ Extension("pyvXRAY.cythonMods", sources=["cython/cythonMods.pyx"],include_dirs=[numpy.get_include()]), ]
+    ext_modules += [ Extension("pyvXRAY.cythonMods", sources=["cython/cythonMods.pyx"],include_dirs=[numpy.get_include()],language="c++")]
     cmdclass.update({ 'build_ext':build_ext })
 else:
-    ext_modules += [ Extension("pyvXRAY.cythonMods", sources=["cython/cythonMods.c"],include_dirs=[numpy.get_include()]), ]
+    ext_modules += [ Extension("pyvXRAY.cythonMods", sources=["cython/cythonMods.cpp"],include_dirs=[numpy.get_include()],language="c++")]
     
 setup(
     name = 'pyvXRAY',
     version = pyvXRAY.__version__,
     description = 'ABAQUS plug-in to create virtual x-rays from 3D finite element bone/implant models',
     license = 'MIT license',
-    keywords = ["ABAQUS", "plug-in","virtual", "x-rays","finite","element","bone","python","cython"],    
+    keywords = ["ABAQUS","plug-in","virtual","x-rays","finite","element","bone","python","cython"],
     author = 'Michael Hogg',
     author_email = 'michael.christopher.hogg@gmail.com',
     url = "https://github.com/mhogg/pyvxray",

@@ -1,11 +1,11 @@
 The pyvXRAY source distribution was built using the following procedure:
 1. Open command prompt and go to pyvXRAY directory
-2. Create cythonMods.c file: 
+2. Create cythonMods.cpp file: 
    $ cd cython
-   $ cython -a cythonMods.pyx
+   $ cython -a cythonMods.pyx --cplus
 3. Build the source distribution
    $ cd..
-   $ python setup.py sdist
+   $ abaqus python setup.py sdist
 
 The pyvXRAY binary distribution was then built using the following procedure:
 

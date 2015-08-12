@@ -1,4 +1,9 @@
 
+Version 0.2.1: Release date 2015-08-12
+--------------------------------------
+1. Fixed bug when import PIL / Pillow in ABAQUS GUI for Abaqus v6.13.
+2. Changed cython to use C++, not C
+
 Version 0.2.0: Release date 2013-10-10
 --------------------------------------
 1. Added support for assembly element sets, part instance element sets and all elements

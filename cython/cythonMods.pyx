@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013 Michael Hogg
+# Copyright (C) 2015 Michael Hogg
 
 # This file is part of pyvXRAY - See LICENSE.txt for information on usage and redistribution
 
-# cython: profile=True
+# cython: profile=False
 # cython: boundscheck=False
 # cython: wraparound=False
 # cython: infer_types=True
