@@ -4,10 +4,11 @@ pyvXRAY
 **An ABAQUS plug-in for the creation of virtual x-rays from 3D finite
 element bone/implant models.**
 
-**Developed together with
-`bonemapy <https://github.com/mhogg/bonemapy>`__ and
-`BMDanalyse <https://github.com/mhogg/BMDanalyse>`__ to provide tools
-for preparation and post-processing of bone/implant computer models.**
+Developed together with `bonemapy`_ and `BMDanalyse`_ to provide tools
+for preparation and post-processing of bone/implant computer models.
+
+.. _bonemapy: https://github.com/mhogg/bonemapy
+.. _BMDanalyse: https://github.com/mhogg/BMDanalyse
 
 Copyright 2013, Michael Hogg (michael.christopher.hogg@gmail.com)
 
