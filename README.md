@@ -5,7 +5,7 @@
 **Developed together with [bonemapy](https://github.com/mhogg/bonemapy) and [BMDanalyse](https://github.com/mhogg/BMDanalyse) to provide tools for preparation and post-processing of bone/implant computer models.**
 
 [![PyPi version](https://img.shields.io/pypi/v/pyvxray.svg)](https://pypi.python.org/pypi/pyvxray/)
-[![PyPi downloads](https://img.shields.io/pypi/dm/pyvxray.svg)](https://pypi.python.org/pypi/pyxray/)
+[![PyPi downloads](https://img.shields.io/pypi/dm/pyvxray.svg)](https://pypi.python.org/pypi/pyvxray/)
 
 Copyright 2013, Michael Hogg (michael.christopher.hogg@gmail.com)
 
